@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}首页{% endblock %}
+{% block content %}
+    <!-- post -->
+    {% for blog in blogs %}
+        <article class="uk-article">
+            <h1 class="uk-article-title">
+                <a href="/blog/{{ blog.id }}">{{ blog.title }}</a>
+            </h1>
+            <p>{{ blog.html_summary|safe }}</p>
+            <p class="uk-article-meta">
+                <span>由 <a href="/user/{{ blog.user_id }}">{{ blog.user_name }}</a> 发表于 {{ blog.created_at|deltatime}} </span>
+                <a class="uk-button uk-button-primary uk-float-right" href="/blog/{{ blog.id }}">继续阅读</a>
+            </p>
+        </article>
+    {% endfor %}
+    <!-- end post -->
+
+    {{ pagination('/?page=', page) }}
+{% endblock %}

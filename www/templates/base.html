@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+{% macro pagination(url, page) %}
+    <ul class="uk-pagination">
+        {% if page.has_pre %}
+            <li><a href="{{ url }}{{ page.page_index - 1 }}"><i class="uk-icon-angle-double-left"></i></a></li>
+        {% else %}
+            <li class="uk-disabled"><span><i class="uk-icon-angle-double-left"></i></span></li>
+        {% endif %}
+
+        {% if page.page_index == 1 %}
+            <li class="uk-active"><span>1</span></li>
+        {% else %}
+            <li><a href="{{ url }}{{ 1 }}">1</a></li>
+        {% endif %}
+
+        {% if page.pagelist %}
+            {% if page.pagelist[0] > 2 %}
+                <li><span>...</span></li>
+            {% endif %}
+
+            {% for pl in page.pagelist %}
+                {% if pl == page.page_index %}
+                    <li class="uk-active"><span>{{ page.page_index }}</span></li>
+                {% else %}
+                    <li><a href="{{ url }}{{ pl }}">{{ pl }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page.pagelist[-1] < (page.page_count-1) %}
+                <li><span>...</span></li>
+            {% endif %}
+        {% endif %}
+
+        {% if page.page_count != 1 %}
+            {% if page.page_index == page.page_count %}
+                <li class="uk-active"><span>{{ page.page_count }}</span></li>
+            {% else %}
+                <li><a href="{{ url }}{{ page.page_count }}">{{ page.page_count }}  </a></li>
+            {% endif %}
+        {% endif %}
+
+        {% if page.has_next %}
+            <li><a href="{{ url }}{{ page.page_index + 1 }}"><i class="uk-icon-angle-double-right"></i></a></li>
+        {% else %}
+            <li class="uk-disabled"><span><i class="uk-icon-angle-double-right"></i></span></li>
+        {% endif %}
+    </ul>
+{% endmacro %}
+<html class="uk-notouch">
+<head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        {% block meta %}<!-- block meta  -->{% endblock %}
+        <title>{% block title %} ? {% endblock %} - {{ web_meta.web_name }}</title>
+        <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="/static/css/uikit.almost-flat.min.css">
+        <script src="/static/js/jquery.js"></script>
+        <script src="/static/js/uikit.min.js"></script>
+        <script src="/static/js/vue.min.js"></script>
+        <script src="/static/js/awesome.js"></script>
+        <script src="/static/js/sha1.min.js"></script>
+        {% block script %}<!-- script  -->{% endblock %}
+</head>
+
+    <body>
+
+        <div class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
+
+            <!-- menu -->
+            <nav class="uk-navbar uk-margin-large-bottom">
+                <a class="uk-navbar-brand uk-hidden-small" href="/">{{ web_meta.web_name }}</a>
+                <ul class="uk-navbar-nav uk-hidden-small">
+                    <li class="uk-active">
+                        <a href="/">博客</a>
+                    </li>
+                    <li>
+                        <a href="#0">关于</a>
+                    </li>
+                </ul>
+                <div class="uk-navbar-flip uk-hidden-small">
+                    <ul class="uk-navbar-nav">
+                    {% if user %}
+                        <li class="uk-parent" data-uk-dropdown>
+                            <a href="#0"><i class="uk-icon-user"></i> {{ user.name }} <i class="uk-icon-caret-down"></i></a>
+                            <div class="uk-dropdown uk-dropdown-navbar uk-dropdown-small">
+                                <ul class="uk-nav uk-nav-navbar">
+                                <li><a href="/manage"><i class="uk-icon-gear"></i> 后台管理</a></li>
+                                    <li><a href="/logout"><i class="uk-icon-sign-out"></i> 登出</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li><a href="/login"><i class="uk-icon-sign-in"></i> 登陆</a></li>
+                        <li><a href="/signup"><i class="uk-icon-edit"></i> 注册</a></li>
+                    {% endif %}
+                    </ul>
+                </div>
+                <a href="#offcanvas" class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas></a>
+                <a class="uk-navbar-brand uk-navbar-center uk-visible-small"  href="/">{{ web_meta.web_name }}</a>
+            </nav>
+            <!-- end menu -->
+
+            <div class="uk-grid" data-uk-grid-margin="">
+                <div class="uk-width-medium-3-4 uk-row-first">
+                    <!-- content -->
+                    {% block content %}
+                    {% endblock %}
+                    <!-- end content -->
+                </div>
+
+                <!-- sidebar -->
+                <div class="uk-width-medium-1-4">
+                    <div class="uk-panel uk-panel-box uk-text-center">
+                        <img class="uk-border-circle" width="120" height="120" src="{{ web_meta.logo }}" alt="">
+                        <h3>{{ web_meta.web_name }}</h3>
+                        <p>{{ web_meta.welcome_message }}</p>
+                    </div>
+                    <div class="uk-panel">
+                        <h3 class="uk-panel-title">文章分类</h3>
+                        <ul class="uk-list uk-list-line">
+                            {% for cat in cats %}
+                                <li><a href="/category/{{ cat.id }}">{{ cat.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="uk-panel">
+                        <h3 class="uk-panel-title">友情链接</h3>
+                        <ul class="uk-list">
+                            <li><a target="_blank" href="https://github.com">GitHub</a></li>
+                            <li><a target="_blank" href="https://disqus.com">Disqus</a></li>
+                            <li><a target="_blank" href="http://www.weibo.com">weibo</a></li>
+                            <li><a target="_blank" href="http://www.csdn.net">CSDN</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- end sidebar -->
+            </div>
+
+        </div>
+
+        <div id="offcanvas" class="uk-offcanvas">
+            <div class="uk-offcanvas-bar">
+                <ul class="uk-nav uk-nav-offcanvas uk-nav-parent-icon" data-uk-nav>
+                    <li>
+                        <a href="http://www.getuikit.net/docs/layouts_frontpage.html">Frontpage</a>
+                    </li>
+                    <li>
+                        <a href="http://www.getuikit.net/docs/layouts_portfolio.html">Portfolio</a>
+                    </li>
+                    <li class="uk-active">
+                        <a href="http://www.getuikit.net/docs/layouts_blog.html">Blog</a>
+                    </li>
+                    <li>
+                        <a href="http://www.getuikit.net/docs/layouts_documentation.html">Documentation</a>
+                    </li>
+                    <li>
+                        <a href="http://www.getuikit.net/docs/layouts_contact.html">Contact</a>
+                    </li>
+                    <li>
+                        <a href="http://www.getuikit.net/docs/layouts_login.html">Login</a>
+                    </li>
+                    <li class="uk-nav-divider"></li>
+                    {% if user %}
+                        <li class="uk-parent">
+                            <a href="#"><i class="uk-icon-user"></i> {{ user.name }}</a>
+                            <ul class="uk-nav-sub">
+                                <li><a href="/manage/blogs"><i class="uk-icon-gear"></i> 后台管理</a></li>
+                                <li><a href="/logout"><i class="uk-icon-sign-out"></i> 登出</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li><a href="/login"><i class="uk-icon-sign-in"></i> 登陆</a></li>
+                        <li><a href="/signin"><i class="uk-icon-edit"></i> 注册</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- footer -->
+        <div class="uk-block uk-block-secondary uk-contrast">
+        <div class="uk-container uk-container-center uk-text-center">
+            <div class="uk-panel uk-margin-top uk-margin-bottom">
+                <p>
+                    <a target="_blank" href="#" class="uk-icon-button uk-icon-weibo"></a>
+                    <a target="_blank" href="#" class="uk-icon-button uk-icon-weixin"></a>
+                    <a target="_blank" href="#" class="uk-icon-button uk-icon-qq"></a>
+                </p>
+                <p>Powered by <a href="#">{{ web_meta.app_name }}</a>. Copyright &copy; 2016.</p>
+                <p><a href="http://www.cashqian.net/" target="_blank">www.cashqian.net</a>. All rights reserved.</p>
+            </div>
+        </div>
+        </div>
+        <!-- end footer -->
+
+    </body>
+</html>
