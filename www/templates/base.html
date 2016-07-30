@@ -31,11 +31,11 @@
             {% endif %}
         {% endif %}
 
-        {% if page.page_count != 1 %}
+        {% if page.page_count > 1 %}
             {% if page.page_index == page.page_count %}
                 <li class="uk-active"><span>{{ page.page_count }}</span></li>
             {% else %}
-                <li><a href="{{ url }}{{ page.page_count }}">{{ page.page_count }}  </a></li>
+                <li><a href="{{ url }}{{ page.page_count }}">{{ page.page_count }}</a></li>
             {% endif %}
         {% endif %}
 

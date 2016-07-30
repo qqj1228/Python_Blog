@@ -49,5 +49,6 @@ create table category (
     `id` varchar(50) not null primary key,
     `name` varchar(50) not null,
     `created_at` real not null,
+    unique key `idx_name` (`name`),
     key `idx_created_at` (`created_at`)
 ) engine=innodb default charset=utf8;

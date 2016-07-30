@@ -92,6 +92,31 @@ async def get_user(id, request):
 		'user_show': user_show
 	}
 
+@get('/category/{id}')
+async def get_category(id, request, *, page='1'):
+	user = request.__user__
+	cats = await Category.findAll(orderBy='created_at desc')
+	category = await Category.find(id)
+	page_index = Page.page2int(page)
+	num = await Blog.findNumber('*', 'cat_id=?', [id])
+	p = Page(num, page_index, item_page=configs.blog_item_page, page_show=configs.page_show)
+	p.pagelist()
+	if num == 0:
+		blogs = []
+	else:
+		blogs = await Blog.findAll('cat_id=?', [id], orderBy='created_at desc', limit=(p.offset, p.limit))
+		for blog in blogs:
+			blog.html_summary = markdown(blog.summary)
+	return {
+		'__template__': 'category.html',
+		'web_meta': configs.web_meta,
+		'user': user,
+		'cats': cats,
+		'page': p,
+		'category': category,
+		'blogs': blogs
+	}
+
 @get('/api/blogs/{id}')
 async def api_show_blogs(*, id):
 	blog = await Blog.find(id)
@@ -311,7 +336,7 @@ async def api_login(*, email, password, rememberme):
 	return r
 
 @post('/api/create_blog')
-async def api_create_blog(request, *, title, summary, content):
+async def api_create_blog(request, *, title, summary, content, cat_name):
 	if request.__user__ is None or not request.__user__.admin:
 		raise APIPermissionError()
 	if not title or not title.strip():
@@ -320,12 +345,19 @@ async def api_create_blog(request, *, title, summary, content):
 		raise APIValueError('content', 'Content can not be empty.')
 	if not summary or not summary.strip():
 		summary = content.strip()[:200]
-	blog = Blog(user_id=request.__user__.id, user_name=request.__user__.name, user_image=request.__user__.image, title=title.strip(), summary=summary.strip(), content=content.strip())
+	if not cat_name.strip():
+		cat_id = None
+	else:
+		cats = await Category.findAll('name=?', [cat_name.strip()])
+		if (len(cats) == 0):
+			raise APIValueError('cat_name', 'cat_name is not belong to Category.')
+		cat_id = cats[0].id
+	blog = Blog(user_id=request.__user__.id, user_name=request.__user__.name, user_image=request.__user__.image, title=title.strip(), summary=summary.strip(), content=content.strip(), cat_id=cat_id, cat_name=cat_name.strip())
 	await blog.save()
 	return blog
 
 @post('/api/blogs/{id}')
-async def api_update_blog(id, request, *, title, summary, content):
+async def api_update_blog(id, request, *, title, summary, content, cat_name):
 	if request.__user__ is None or not request.__user__.admin:
 		raise APIPermissionError()
 	if not title or not title.strip():
@@ -338,6 +370,14 @@ async def api_update_blog(id, request, *, title, summary, content):
 	blog.title = title.strip()
 	blog.summary = summary.strip()
 	blog.content = content.strip()
+	blog.cat_name = cat_name.strip()
+	if not cat_name.strip():
+		blog.cat_id = None
+	else:
+		cats = await Category.findAll('name=?', [cat_name.strip()])
+		if (len(cats) == 0):
+			raise APIValueError('cat_name', 'cat_name is not belong to Category.')
+		blog.cat_id = cats[0].id
 	await blog.update()
 	return blog
 
