@@ -8,6 +8,7 @@
 - jinja2
 - aiomysql
 - aiohttp
+- markdown2
 
 增加了以下功能：
 
