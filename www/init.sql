@@ -6,7 +6,7 @@ create database blogwebapp character set utf8;
 
 use blogwebapp;
 
-grant select, insert, update, delete on blogwebapp.* to 'qqj1228'@'localhost' identified by 'qqj1228';
+grant select, insert, update, delete on blogwebapp.* to 'qqj1228'@'localhost' identified by 'crkqj128';
 
 create table user (
     `id` varchar(50) not null primary key,
