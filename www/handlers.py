@@ -294,7 +294,7 @@ async def api_signin(*, email, name, password):
 		raise APIError('signin:failed', 'email', 'Email is already in use.')
 	uid = next_id()
 	sha1_password = '%s:%s' % (uid, password)
-	user = User(id=uid, name=name.strip(), email=email, password=hashlib.sha1(sha1_password.encode('utf-8')).hexdigest(), image=configs.default_user_image)
+	user = User(id=uid, name=name.strip(), email=email, password=hashlib.sha1(sha1_password.encode('utf-8')).hexdigest(), image=configs.web_meta.user_image)
 	await user.save()
 	# 设置cookie
 	r = web.Response()
