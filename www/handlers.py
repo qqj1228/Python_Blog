@@ -31,7 +31,8 @@ async def index(request, *, page='1'):
 		'user': user,
 		'cats': cats,
 		'page': p,
-		'blogs': blogs
+		'blogs': blogs,
+		'disqus': configs.use_disqus
 	}
 
 @get('/signup')
@@ -114,7 +115,8 @@ async def get_category(id, request, *, page='1'):
 		'cats': cats,
 		'page': p,
 		'category': category,
-		'blogs': blogs
+		'blogs': blogs,
+		'disqus': configs.use_disqus
 	}
 
 @get('/api/blogs/{id}')
