@@ -7,117 +7,117 @@
 <script type="text/javascript" src="http://cdn.staticfile.org/webuploader/0.1.5/webuploader.min.js"></script>
 <script type="text/javascript" src="/static/js/upload_image.js"></script>
 
-	<script type="text/javascript">
-	var id = '{{ id }}';
-	var action = '{{ action }}';
+    <script type="text/javascript">
+    var id = '{{ id }}';
+    var action = '{{ action }}';
 
-	function initVM(blog) {
-		var vm = new Vue({
-			el: '#vm',
-			data: blog,
-			methods: {
-				submit: function (event) {
-					event.preventDefault();
-					var $form = $('#vm');
-					$form.postJSON(action, this.$data, function(err, r) {
-						if (err) {
-							$form.showFormError(err);
-						} else {
-							return location.assign('/manage/blogs');
-						}
-					});
-				}
-			}
-		});
-		$('#vm').show();
-	}
+    function initVM(blog) {
+        var vm = new Vue({
+            el: '#vm',
+            data: blog,
+            methods: {
+                submit: function (event) {
+                    event.preventDefault();
+                    var $form = $('#vm');
+                    $form.postJSON(action, this.$data, function(err, r) {
+                        if (err) {
+                            $form.showFormError(err);
+                        } else {
+                            return location.assign('/manage/blogs');
+                        }
+                    });
+                }
+            }
+        });
+        $('#vm').show();
+    }
 
-	$(function () {
-		if (id) {
-			getJSON('/api/blogs/' + id, function (err, blog) {
-				if (err) {
-					return fatal(err);
-				}
-				$('#loading').hide();
-				initVM(blog);
-			});
-		} else {
-			$('#loading').hide();
-			initVM({
-				title: '',
-				summary: '',
-				content: '',
-				cat_name: ''
-			});
-		}
-	});
-	</script>
+    $(function () {
+        if (id) {
+            getJSON('/api/blogs/' + id, function (err, blog) {
+                if (err) {
+                    return fatal(err);
+                }
+                $('#loading').hide();
+                initVM(blog);
+            });
+        } else {
+            $('#loading').hide();
+            initVM({
+                title: '',
+                summary: '',
+                content: '',
+                cat_name: ''
+            });
+        }
+    });
+    </script>
 {% endblock %}
 {% block content %}
-	<div class="uk-width-1-1 uk-margin-bottom">
-		<div class="uk-panel uk-panel-box">
-			<ul class="uk-breadcrumb">
-				<li><a href="/manage/blogs">文章管理</a></li>
-				<li><a href="/manage/comments">本地评论管理</a></li>
-				<li><a href="/manage/users">用户管理</a></li>
-				<li><a href="/manage/categories">分类管理</a></li>
-			</ul>
-		</div>
-	</div>
+    <div class="uk-width-1-1 uk-margin-bottom">
+        <div class="uk-panel uk-panel-box">
+            <ul class="uk-breadcrumb">
+                <li><a href="/manage/blogs">文章管理</a></li>
+                <li><a href="/manage/comments">本地评论管理</a></li>
+                <li><a href="/manage/users">用户管理</a></li>
+                <li><a href="/manage/categories">分类管理</a></li>
+            </ul>
+        </div>
+    </div>
 
-	<div id="error" class="uk-width-1-1">
-	</div>
+    <div id="error" class="uk-width-1-1">
+    </div>
 
-	<div id="loading" class="uk-width-1-1 uk-text-center uk-margin-bottom">
-		<span><i class="uk-icon-spinner uk-icon-medium uk-icon-spin"></i> 正在加载...</span>
-	</div>
+    <div id="loading" class="uk-width-1-1 uk-text-center uk-margin-bottom">
+        <span><i class="uk-icon-spinner uk-icon-medium uk-icon-spin"></i> 正在加载...</span>
+    </div>
 
-	<form id="vm" v-on:submit="submit" class="uk-panel uk-panel-box uk-panel-header uk-form uk-form-stacked">
-		<h3 class="uk-panel-title">编辑文章内容</h3>
-		<div class="uk-alert uk-alert-danger uk-hidden"></div>
-		<div class="uk-form-row">
-			<label class="uk-form-label">标题:</label>
-			<div class="uk-form-controls">
-				<input v-model="title" name="title" class="uk-width-1-1" maxlength="50" type="text" placeholder="文章标题">
-			</div>
-		</div>
-		<div class="uk-form-row">
-			<label class="uk-form-label">摘要:</label>
-			<div class="uk-form-controls">
-				<textarea v-model="summary" name="summary" class="uk-width-1-1" rows="4" placeholder="摘要（若留空的话，直接取文章内容的前200字）"></textarea>
-			</div>
-		</div>
-		<div class="uk-form-row">
-			<label class="uk-form-label">文章内容:</label>
-			<div class="uk-form-controls">
-				<textarea v-model="content" name="content" class="uk-width-1-1" rows="16" placeholder="文章内容（使用markdown语法）"></textarea>
-			</div>
-		</div>
-		<div class="uk-form-row">
-			<label class="uk-form-label">分类:</label>
-			<div class="uk-form-controls">
-				<select v-model="cat_name" name="cat_name" class="uk-width-1-1">
-					<option></option>
-					{% for cat in cats %}
-						<option>{{ cat.name }}</option>
-					{% endfor %}
-		        </select>
-			</div>
-		</div>
-		<div class="uk-form-row">
-			<button class="uk-button uk-button-primary" type="submit"><i class="uk-icon-save"></i> 保存</button>
-			<button class="uk-button uk-button-primary" type="reset"><i class="uk-icon-repeat"></i> 重置</button>
-			<a href="/manage/blogs" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
-		</div>
-	</form>
-	<div id="uploader" class="uk-panel uk-panel-box">
-		<h3 class="uk-panel-title">上传图片:(插入路径:/static/upload/文件名)</h3>
-		<!--用来存放文件信息-->
-		<div id="fileList" class=""></div>
-		<!--用来显示进度条-->
-		<div class="uk-progress uk-hidden">
-			<div class="uk-progress-bar"></div>
-		</div>
-		<div id="filePicker"><i class="uk-icon-file-image-o"></i> 选择图片</div>
-	</div>
+    <form id="vm" v-on:submit="submit" class="uk-panel uk-panel-box uk-panel-header uk-form uk-form-stacked">
+        <h3 class="uk-panel-title">编辑文章内容</h3>
+        <div class="uk-alert uk-alert-danger uk-hidden"></div>
+        <div class="uk-form-row">
+            <label class="uk-form-label">标题:</label>
+            <div class="uk-form-controls">
+                <input v-model="title" name="title" class="uk-width-1-1" maxlength="50" type="text" placeholder="文章标题">
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <label class="uk-form-label">摘要:</label>
+            <div class="uk-form-controls">
+                <textarea v-model="summary" name="summary" class="uk-width-1-1" rows="4" placeholder="摘要（若留空的话，直接取文章内容的前200字）"></textarea>
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <label class="uk-form-label">文章内容:</label>
+            <div class="uk-form-controls">
+                <textarea v-model="content" name="content" class="uk-width-1-1" rows="16" placeholder="文章内容（使用markdown语法）"></textarea>
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <label class="uk-form-label">分类:</label>
+            <div class="uk-form-controls">
+                <select v-model="cat_name" name="cat_name" class="uk-width-1-1">
+                    <option></option>
+                    {% for cat in cats %}
+                        <option>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <button class="uk-button uk-button-primary" type="submit"><i class="uk-icon-save"></i> 保存</button>
+            <button class="uk-button uk-button-primary" type="reset"><i class="uk-icon-repeat"></i> 重置</button>
+            <a href="/manage/blogs" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
+        </div>
+    </form>
+    <div id="uploader" class="uk-panel uk-panel-box">
+        <h3 class="uk-panel-title">上传图片:(插入路径:/static/upload/文件名)</h3>
+        <!--用来存放文件信息-->
+        <div id="fileList" class=""></div>
+        <!--用来显示进度条-->
+        <div class="uk-progress uk-hidden">
+            <div class="uk-progress-bar"></div>
+        </div>
+        <div id="filePicker"><i class="uk-icon-file-image-o"></i> 选择图片</div>
+    </div>
 {% endblock %}

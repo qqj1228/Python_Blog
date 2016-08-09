@@ -1,81 +1,81 @@
 {% extends 'base.html' %}
 {% block title %}编辑分类{% endblock %}
 {% block script %}
-	<script type="text/javascript">
-	var id = '{{ id }}';
-	var action = '{{ action }}';
+    <script type="text/javascript">
+    var id = '{{ id }}';
+    var action = '{{ action }}';
 
-	function initVM(category) {
-		var vm = new Vue({
-			el: '#vm',
-			data: category,
-			methods: {
-				submit: function (event) {
-					event.preventDefault();
-					var $form = $('#vm');
-					$form.postJSON(action, this.$data, function(err, r) {
-						if (err) {
-							$form.showFormError(err);
-						} else {
-							return location.assign('/manage/categories');
-						}
-					});
-				}
-			}
-		});
-		$('#vm').show();
-	}
+    function initVM(category) {
+        var vm = new Vue({
+            el: '#vm',
+            data: category,
+            methods: {
+                submit: function (event) {
+                    event.preventDefault();
+                    var $form = $('#vm');
+                    $form.postJSON(action, this.$data, function(err, r) {
+                        if (err) {
+                            $form.showFormError(err);
+                        } else {
+                            return location.assign('/manage/categories');
+                        }
+                    });
+                }
+            }
+        });
+        $('#vm').show();
+    }
 
-	$(function () {
-		if (id) {
-			getJSON('/api/categories/' + id, function (err, category) {
-				if (err) {
-					return fatal(err);
-				}
-				$('#loading').hide();
-				initVM(category);
-			});
-		} else {
-			$('#loading').hide();
-			initVM({
-				name: ''
-			});
-		}
-	});
-	</script>
+    $(function () {
+        if (id) {
+            getJSON('/api/categories/' + id, function (err, category) {
+                if (err) {
+                    return fatal(err);
+                }
+                $('#loading').hide();
+                initVM(category);
+            });
+        } else {
+            $('#loading').hide();
+            initVM({
+                name: ''
+            });
+        }
+    });
+    </script>
 {% endblock %}
 {% block content %}
-	<div class="uk-width-1-1 uk-margin-bottom">
-		<div class="uk-panel uk-panel-box">
-			<ul class="uk-breadcrumb">
-				<li><a href="/manage/blogs">文章管理</a></li>
-				<li><a href="/manage/comments">本地评论管理</a></li>
-				<li><a href="/manage/users">用户管理</a></li>
-				<li><a href="/manage/categories">分类管理</a></li>
-			</ul>
-		</div>
-	</div>
+    <div class="uk-width-1-1 uk-margin-bottom">
+        <div class="uk-panel uk-panel-box">
+            <ul class="uk-breadcrumb">
+                <li><a href="/manage/blogs">文章管理</a></li>
+                <li><a href="/manage/comments">本地评论管理</a></li>
+                <li><a href="/manage/users">用户管理</a></li>
+                <li><a href="/manage/categories">分类管理</a></li>
+            </ul>
+        </div>
+    </div>
 
-	<div id="error" class="uk-width-1-1">
-	</div>
+    <div id="error" class="uk-width-1-1">
+    </div>
 
-	<div id="loading" class="uk-width-1-1 uk-text-center uk-margin-bottom">
-		<span><i class="uk-icon-spinner uk-icon-medium uk-icon-spin"></i> 正在加载...</span>
-	</div>
+    <div id="loading" class="uk-width-1-1 uk-text-center uk-margin-bottom">
+        <span><i class="uk-icon-spinner uk-icon-medium uk-icon-spin"></i> 正在加载...</span>
+    </div>
 
-	<form id="vm" v-on:submit="submit" class="uk-panel uk-panel-box uk-panel-header uk-form uk-form-stacked">
-		<h3 class="uk-panel-title">编辑分类名称</h3>
-		<div class="uk-alert uk-alert-danger uk-hidden"></div>
-		<div class="uk-form-row">
-			<label class="uk-form-label">分类名称:</label>
-			<div class="uk-form-controls">
-				<input v-model="name" name="name" class="uk-width-1-1" maxlength="50" type="text" placeholder="分类名称">
-			</div>
-		</div>
-		<div class="uk-form-row">
-			<button class="uk-button uk-button-primary" type="submit"><i class="uk-icon-save"></i> 保存</button>
-			<button class="uk-button uk-button-primary" type="reset"><i class="uk-icon-repeat"></i> 重置</button>
-			<a href="/manage/categories" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
-		</div>
-	</form>
+    <form id="vm" v-on:submit="submit" class="uk-panel uk-panel-box uk-panel-header uk-form uk-form-stacked">
+        <h3 class="uk-panel-title">编辑分类名称</h3>
+        <div class="uk-alert uk-alert-danger uk-hidden"></div>
+        <div class="uk-form-row">
+            <label class="uk-form-label">分类名称:</label>
+            <div class="uk-form-controls">
+                <input v-model="name" name="name" class="uk-width-1-1" maxlength="50" type="text" placeholder="分类名称">
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <button class="uk-button uk-button-primary" type="submit"><i class="uk-icon-save"></i> 保存</button>
+            <button class="uk-button uk-button-primary" type="reset"><i class="uk-icon-repeat"></i> 重置</button>
+            <a href="/manage/categories" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
+        </div>
+    </form>
 {% endblock %}
