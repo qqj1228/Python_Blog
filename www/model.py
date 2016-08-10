@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 # coding:utf-8
 
-import time, uuid
+import time
+import uuid
 
 from myorm import Model, StringField, BoolField, FloatField, TextField
 
+
 def next_id():
     return '%015d%s000' % (int(time.time() * 1000), uuid.uuid4().hex)
+
 
 class User(Model):
     __table__ = 'user'
@@ -17,6 +20,7 @@ class User(Model):
     name = StringField(col_type='varchar(50)')
     image = StringField(col_type='varchar(500)')
     created_at = FloatField(default=time.time)
+
 
 class Blog(Model):
     __table__ = 'blog'
@@ -31,6 +35,7 @@ class Blog(Model):
     content = TextField()
     created_at = FloatField(default=time.time)
 
+
 class Comment(Model):
     __table__ = 'comment'
     id = StringField(primary_key=True, default=next_id, col_type='varchar(50)')
@@ -40,6 +45,7 @@ class Comment(Model):
     user_image = StringField(col_type='varchar(500)')
     content = TextField()
     created_at = FloatField(default=time.time)
+
 
 class Category(Model):
     __table__ = 'category'

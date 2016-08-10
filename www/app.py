@@ -5,8 +5,10 @@
 async web application
 '''
 
-import logging; logging.basicConfig(level=logging.INFO)
-import asyncio, os, time
+import logging
+import asyncio
+import os
+import time
 from datetime import datetime
 
 from aiohttp import web
@@ -16,11 +18,14 @@ import myorm
 from webframe import add_routes, add_static, logger_factory, response_factory, auth_factory
 from configloader import configs
 
+logging.basicConfig(level=logging.INFO)
+
+
 def init_jinja2(app, **kw):
     logging.info('init jinja2...')
     options = dict(
-        autoescape = kw.get('autoescape', True),
-        auto_reload = kw.get('auto_reload', True)
+        autoescape=kw.get('autoescape', True),
+        auto_reload=kw.get('auto_reload', True)
     )
     path = kw.get('path', None)
     if path is None:
@@ -33,11 +38,12 @@ def init_jinja2(app, **kw):
             env.filters[name] = f
     app['__template_env__'] = env
 
+
 def deltatime_filter(t):
     '''
     jinjia2自定义过滤器
     '''
-    delta = int (time.time()-t)
+    delta = int(time.time() - t)
     if delta < 60:
         return u'1分钟前'
     if delta < 3600:
@@ -48,6 +54,7 @@ def deltatime_filter(t):
         return u'%s天前' % (delta // 86400)
     dt = datetime.fromtimestamp(t)
     return u'%s年%s月%s日' % (dt.year, dt.month, dt.day)
+
 
 def date_filter(t):
     '''
@@ -62,9 +69,7 @@ async def on_close(app):
 async def init(loop):
     rs = dict()
     await myorm.create_pool(loop, **configs.database)
-    app = web.Application(loop=loop, middlewares=[
-            logger_factory, response_factory, auth_factory
-    ])
+    app = web.Application(loop=loop, middlewares=[logger_factory, response_factory, auth_factory])
     app.on_shutdown.append(on_close)
     init_jinja2(app, filters=dict(deltatime=deltatime_filter, date=date_filter))
     add_routes(app, 'handlers')

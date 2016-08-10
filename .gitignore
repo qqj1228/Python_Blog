@@ -99,3 +99,6 @@ ehthumbs.db
 Thumbs.db
 dist
 MANIFEST
+
+# VS Code
+.vscode/

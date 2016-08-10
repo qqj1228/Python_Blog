@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 # coding:utf-8
 
-import re, hashlib, json, logging, os
+import re
+import hashlib
+import json
+import logging
+import os
 
 from aiohttp import web
 from markdown2 import markdown
@@ -10,6 +14,7 @@ from webframe import get, post, user2cookie, Page
 from model import next_id, User, Blog, Comment, Category
 from configloader import configs
 from APIError import APIError, APIValueError, APIPermissionError, APIResourceNotFoundError
+
 
 @get('/')
 async def index(request, *, page='1'):
@@ -35,6 +40,7 @@ async def index(request, *, page='1'):
         'disqus': configs.use_disqus
     }
 
+
 @get('/signup')
 async def signin():
     cats = await Category.findAll(orderBy='created_at desc')
@@ -43,6 +49,7 @@ async def signin():
         'web_meta': configs.web_meta,
         'cats': cats
     }
+
 
 @get('/login')
 async def login():
@@ -53,6 +60,7 @@ async def login():
         'cats': cats
     }
 
+
 @get('/logout')
 async def logout(request):
     referer = request.headers.get('Referer')
@@ -60,6 +68,7 @@ async def logout(request):
     r.del_cookie(configs.cookie.name)
     logging.info('user logged out.')
     return r
+
 
 @get('/blog/{id}')
 async def get_blog(id, request):
@@ -80,6 +89,7 @@ async def get_blog(id, request):
         'disqus': configs.use_disqus
     }
 
+
 @get('/user/{id}')
 async def get_user(id, request):
     user = request.__user__
@@ -92,6 +102,7 @@ async def get_user(id, request):
         'cats': cats,
         'user_show': user_show
     }
+
 
 @get('/category/{id}')
 async def get_category(id, request, *, page='1'):
@@ -119,10 +130,12 @@ async def get_category(id, request, *, page='1'):
         'disqus': configs.use_disqus
     }
 
+
 @get('/api/blogs/{id}')
 async def api_show_blogs(*, id):
     blog = await Blog.find(id)
     return blog
+
 
 # handler带有默认值的命名关键字参数，用来处理带有查询字符串的url
 @get('/api/blogs')
@@ -135,6 +148,7 @@ async def api_blogs(*, page='1'):
     blogs = await Blog.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
     return dict(page=p, blogs=blogs)
 
+
 # handler带有默认值的命名关键字参数，用来处理带有查询字符串的url
 @get('/api/comments')
 async def api_comments(*, page='1'):
@@ -145,6 +159,7 @@ async def api_comments(*, page='1'):
         return dict(page=p, comments=())
     comments = await Comment.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
     return dict(page=p, comments=comments)
+
 
 # handler带有默认值的命名关键字参数，用来处理带有查询字符串的url
 @get('/api/users')
@@ -159,6 +174,7 @@ async def api_get_users(*, page='1'):
         u.password = '******'
     return dict(page=p, users=users)
 
+
 # handler带有默认值的命名关键字参数，用来处理带有查询字符串的url
 @get('/api/categories')
 async def api_categories(*, page='1'):
@@ -170,14 +186,17 @@ async def api_categories(*, page='1'):
     categories = await Category.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
     return dict(page=p, categories=categories)
 
+
 @get('/api/categories/{id}')
 async def api_show_categories(*, id):
     cat = await Category.find(id)
     return cat
 
+
 @get('/manage')
 def manage():
     return 'redirect:/manage/blogs'
+
 
 @get('/manage/blogs')
 async def manage_blogs(request, *, page='1'):
@@ -190,6 +209,7 @@ async def manage_blogs(request, *, page='1'):
         'cats': cats,
         'page_index': Page.page2int(page)
     }
+
 
 @get('/manage/blogs/create')
 async def manage_blogs_create(request):
@@ -204,6 +224,7 @@ async def manage_blogs_create(request):
         'action': '/api/create_blog'
     }
 
+
 @get('/manage/blogs/edit')
 async def manage_blogs_edit(request, *, id):
     user = request.__user__
@@ -217,6 +238,7 @@ async def manage_blogs_edit(request, *, id):
         'action': '/api/blogs/%s' % id
     }
 
+
 @get('/manage/comments')
 async def manage_comments(request, *, page='1'):
     user = request.__user__
@@ -228,6 +250,7 @@ async def manage_comments(request, *, page='1'):
         'cats': cats,
         'page_index': Page.page2int(page)
     }
+
 
 @get('/manage/users')
 async def manage_users(request, *, page='1'):
@@ -241,6 +264,7 @@ async def manage_users(request, *, page='1'):
         'page_index': Page.page2int(page)
     }
 
+
 @get('/manage/categories')
 async def manage_categories(request, *, page='1'):
     user = request.__user__
@@ -252,6 +276,7 @@ async def manage_categories(request, *, page='1'):
         'cats': cats,
         'page_index': Page.page2int(page)
     }
+
 
 @get('/manage/categories/create')
 async def manage_categories_create(request):
@@ -265,6 +290,7 @@ async def manage_categories_create(request):
         'id': '',
         'action': '/api/create_category'
     }
+
 
 @get('/manage/categories/edit')
 async def manage_categories_edit(request, *, id):
@@ -281,6 +307,7 @@ async def manage_categories_edit(request, *, id):
 
 RE_EMAIL = re.compile(r'^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$')
 RE_SHA1 = re.compile(r'^[0-9a-f]{40}$')
+
 
 @post('/api/signup')
 async def api_signin(*, email, name, password):
@@ -305,6 +332,7 @@ async def api_signin(*, email, name, password):
     r.content_type = 'application/json'
     r.body = json.dumps(user, ensure_ascii=False).encode('utf-8')
     return r
+
 
 @post('/api/login')
 async def api_login(*, email, password, rememberme):
@@ -337,6 +365,7 @@ async def api_login(*, email, password, rememberme):
     r.body = json.dumps(user, ensure_ascii=False).encode('utf-8')
     return r
 
+
 @post('/api/create_blog')
 async def api_create_blog(request, *, title, summary, content, cat_name):
     if request.__user__ is None or not request.__user__.admin:
@@ -357,6 +386,7 @@ async def api_create_blog(request, *, title, summary, content, cat_name):
     blog = Blog(user_id=request.__user__.id, user_name=request.__user__.name, user_image=request.__user__.image, title=title.strip(), summary=summary.strip(), content=content.strip(), cat_id=cat_id, cat_name=cat_name.strip())
     await blog.save()
     return blog
+
 
 @post('/api/blogs/{id}')
 async def api_update_blog(id, request, *, title, summary, content, cat_name):
@@ -383,6 +413,7 @@ async def api_update_blog(id, request, *, title, summary, content, cat_name):
     await blog.update()
     return blog
 
+
 @post('/api/blogs/{id}/delete')
 async def api_delete_blog(request, *, id):
     if request.__user__ is None or not request.__user__.admin:
@@ -392,6 +423,7 @@ async def api_delete_blog(request, *, id):
         raise APIResourceNotFoundError('Blog')
     await blog.remove()
     return dict(id=id)
+
 
 @post('/api/blogs/{id}/comments')
 async def api_create_comment(id, request, *, content):
@@ -407,6 +439,7 @@ async def api_create_comment(id, request, *, content):
     await comment.save()
     return comment
 
+
 @post('/api/comments/{id}/delete')
 async def api_delete_comment(id, request):
     if request.__user__ is None or not request.__user__.admin:
@@ -416,6 +449,7 @@ async def api_delete_comment(id, request):
         raise APIResourceNotFoundError('Comment')
     await comment.remove()
     return dict(id=id)
+
 
 @post('/api/users/{id}/delete')
 async def api_delete_user(id, request):
@@ -427,6 +461,7 @@ async def api_delete_user(id, request):
     await user.remove()
     return dict(id=id)
 
+
 @post('/upload')
 async def upload(request, *, file):
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
@@ -436,11 +471,12 @@ async def upload(request, *, file):
     n = 1
     while os.path.exists(filename):
         filename = '%s~%d%s' % (ext[0], n, ext[1])
-        n = n+1
+        n = n + 1
 
     with open(filename, 'wb') as f:
         f.write(file.file.read())
     return dict(filename=os.path.basename(filename))
+
 
 @post('/api/create_category')
 async def api_create_category(request, *, name):
@@ -452,6 +488,7 @@ async def api_create_category(request, *, name):
     await cat.save()
     return cat
 
+
 @post('/api/categories/{id}')
 async def api_update_category(id, request, *, name):
     if request.__user__ is None or not request.__user__.admin:
@@ -462,6 +499,7 @@ async def api_update_category(id, request, *, name):
     cat.name = name.strip()
     await cat.update()
     return cat
+
 
 @post('/api/categories/{id}/delete')
 async def api_delete_category(id, request):

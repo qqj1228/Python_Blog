@@ -5,30 +5,34 @@ import logging
 
 import aiomysql
 
+
 def logSQL(sql, arg=()):
     logging.info('SQL: %s (arg: %s)' % (sql, arg))
+
 
 async def create_pool(loop, **kw):
     logging.info('create database connection pool...')
     global __pool
     __pool = await aiomysql.create_pool(
-        host = kw.get('host', 'localhost'),
-        port = kw.get('port', 3306),
-        user = kw['user'],
-        password = kw['password'],
-        db = kw['db'],
-        charset = kw.get('charset', 'utf8'),
-        autocommit = kw.get('autocommit', True),
-        maxsize = kw.get('maxsize', 10),
-        minsize = kw.get('minsize', 1),
-        loop = loop
-        )
+        host=kw.get('host', 'localhost'),
+        port=kw.get('port', 3306),
+        user=kw['user'],
+        password=kw['password'],
+        db=kw['db'],
+        charset=kw.get('charset', 'utf8'),
+        autocommit=kw.get('autocommit', True),
+        maxsize=kw.get('maxsize', 10),
+        minsize=kw.get('minsize', 1),
+        loop=loop
+    )
+
 
 async def close_pool():
     logging.info('close database connection pool...')
     global __pool
     __pool.close()
     await __pool.wait_closed()
+
 
 async def select(sql, args, size=None):
     logSQL(sql, args)
@@ -42,6 +46,7 @@ async def select(sql, args, size=None):
                 rs = await cur.fetchall()
         logging.info('rows returned: %s' % len(rs))
         return rs
+
 
 async def execute(sql, args, autocommit=True):
     logSQL(sql, args)
@@ -60,13 +65,16 @@ async def execute(sql, args, autocommit=True):
             raise
         return rows
 
+
 def create_args_string(num):
     L = []
     for n in range(num):
         L.append('?')
     return ', '.join(L)
 
+
 class Field(object):
+
     def __init__(self, name, col_type, primary_key, default):
         self.name = name
         self.col_type = col_type
@@ -76,27 +84,39 @@ class Field(object):
     def __str__(self):
         return '<%s, %s: %s>' % (self.__class__.__name__, self.col_type, self.name)
 
+
 class StringField(Field):
+
     def __init__(self, name=None, primary_key=False, default=None, col_type='varchar(100)'):
         super().__init__(name, col_type, primary_key, default)
 
+
 class BoolField(Field):
+
     def __init__(self, name=None, default=False):
         super().__init__(name, 'boolean', False, default)
 
+
 class IntField(Field):
+
     def __init__(self, name=None, primary_key=False, default=0, col_type='int'):
         super().__init__(name, col_type, primary_key, default)
 
+
 class FloatField(Field):
+
     def __init__(self, name=None, primary_key=False, default=0.0):
         super().__init__(name, 'real', primary_key, default)
 
+
 class TextField(Field):
+
     def __init__(self, name=None, default=None):
         super().__init__(name, 'text', False, default)
 
+
 class ModelMetaclass(type):
+
     def __new__(cls, name, bases, attrs):
         if name == 'Model':
             # 如果是基类Model则不处理
@@ -126,7 +146,7 @@ class ModelMetaclass(type):
             # 将类属性中的field都删除（field信息已全部存在mappings内了）
             attrs.pop(k)
         escaped_fields = list(map(lambda f: '`%s`' % f, fields))
-        attrs['__mappings__'] = mappings # 单独保存属性和列的映射关系
+        attrs['__mappings__'] = mappings    # 单独保存属性和列的映射关系
         attrs['__table__'] = tableName
         attrs['__primary_key__'] = primaryKey
         attrs['__fields__'] = fields
@@ -137,7 +157,9 @@ class ModelMetaclass(type):
         attrs['__delete__'] = 'delete from `%s` where `%s`=?' % (tableName, primaryKey)
         return type.__new__(cls, name, bases, attrs)
 
+
 class Model(dict, metaclass=ModelMetaclass):
+
     def __init__(self, **kw):
         super().__init__(**kw)
 

@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 # coding:utf-8
 
-import asyncio, inspect, os, logging, functools, json, time, hashlib
+import asyncio
+import inspect
+import os
+import logging
+import functools
+import json
+import time
+import hashlib
 
 from aiohttp import web
 from urllib import parse
@@ -9,6 +16,7 @@ from urllib import parse
 from APIError import APIError
 from configloader import configs
 from model import User
+
 
 def get(path):
     '''
@@ -23,6 +31,7 @@ def get(path):
         return wrapper
     return decorator
 
+
 def post(path):
     '''
     Define decorator @post('/path')
@@ -36,6 +45,7 @@ def post(path):
         return wrapper
     return decorator
 
+
 def get_required_kw_args(fn):
     # 获取无缺省值的命名关键字参数
     args = []
@@ -46,6 +56,7 @@ def get_required_kw_args(fn):
             args.append(name)
     return tuple(args)
 
+
 def get_named_kw_args(fn):
     # 获取命名关键字参数
     args = []
@@ -55,6 +66,7 @@ def get_named_kw_args(fn):
             args.append(name)
     return tuple(args)
 
+
 def has_named_kw_arg(fn):
     # 判断是否有命名关键字参数
     params = inspect.signature(fn).parameters
@@ -62,12 +74,14 @@ def has_named_kw_arg(fn):
         if param.kind == inspect.Parameter.KEYWORD_ONLY:
             return True
 
+
 def has_var_kw_arg(fn):
     # 判断是否有关键字参数
     params = inspect.signature(fn).parameters
     for name, param in params.items():
         if param.kind == inspect.Parameter.VAR_KEYWORD:
             return True
+
 
 def has_request_arg(fn):
     # 判断是否有名为'request'的参数，且该参数必须为最后一个参数
@@ -78,13 +92,16 @@ def has_request_arg(fn):
         if name == 'request':
             found = True
             continue
-        if found and (param.kind != inspect.Parameter.VAR_POSITIONAL and \
-                      param.kind != inspect.Parameter.KEYWORD_ONLY and \
+        if found and (param.kind != inspect.Parameter.VAR_POSITIONAL and
+                      param.kind != inspect.Parameter.KEYWORD_ONLY and
                       param.kind != inspect.Parameter.VAR_KEYWORD):
-            raise ValueError('request parameter must be the last named parameter in function: %s%s' % (fn.__name__, str(sig)))
+            raise ValueError('request parameter must be the last named parameter in function: %s%s' %
+                             (fn.__name__, str(sig)))
     return found
 
+
 class RequestHandler(object):
+
     def __init__(self, app, fn):
         self._app = app
         self._func = fn
@@ -107,7 +124,7 @@ class RequestHandler(object):
                         return web.HTTPBadRequest('JSON body must be object.')
                     kw = params
                 elif ct.startswith('application/x-www-form-urlencoded') or \
-                     ct.startswith('multipart/form-data'):
+                        ct.startswith('multipart/form-data'):
                     params = await request.post()
                     kw = dict(**params)
                 else:
@@ -138,7 +155,7 @@ class RequestHandler(object):
         # check required kw
         if self._required_kw_args:
             for name in self._required_kw_args:
-                if not name in kw:
+                if name not in kw:
                     return web.HTTPBadRequest('Missing argument: %s' % name)
         logging.info('call with args: %s' % str(kw))
 
@@ -148,10 +165,12 @@ class RequestHandler(object):
         except APIError as e:
             return dict(error=e.error, data=e.data, message=e.message)
 
+
 def add_static(app):
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
     app.router.add_static('/static', path)
     logging.info('add static %s => %s' % ('/static/', path))
+
 
 def add_route(app, fn):
     method = getattr(fn, '__method__', None)
@@ -161,8 +180,9 @@ def add_route(app, fn):
     if not asyncio.iscoroutinefunction(fn) and not inspect.isgeneratorfunction(fn):
         fn = asyncio.coroutine(fn)
     logging.info('add route %s %s => %s (%s)' % (method, path, fn.__name__,
-                ', '.join(inspect.signature(fn).parameters.keys())))
+                                                 ', '.join(inspect.signature(fn).parameters.keys())))
     app.router.add_route(method, path, RequestHandler(app, fn))
+
 
 def add_routes(app, module_name):
     # 从module_name中批量注册Handler函数
@@ -170,7 +190,7 @@ def add_routes(app, module_name):
     if n == (-1):
         mod = __import__(module_name, globals(), locals())
     else:
-        name = module_name[n+1:]
+        name = module_name[n + 1:]
         mod = getattr(__import__(module_name[:n], globals(), locals(), [name]), name)
 
     for attr in dir(mod):
@@ -183,11 +203,13 @@ def add_routes(app, module_name):
             if method and path:
                 add_route(app, fn)
 
+
 async def logger_factory(app, handler):
     async def logger_middleware(request):
         logging.info('Request: %s %s' % (request.method, request.path))
         return await handler(request)
     return logger_middleware
+
 
 async def response_factory(app, handler):
     async def response_middleware(request):
@@ -215,11 +237,11 @@ async def response_factory(app, handler):
                 resp = web.Response(body=app['__template_env__'].get_template(template).render(**r).encode('utf-8'))
                 resp.content_type = 'text/html;charset=utf-8'
                 return resp
-        if isinstance(r, int) and r>=100 and r<600:
+        if isinstance(r, int) and r >= 100 and r < 600:
             return web.Response(r)
         if isinstance(r, tuple) and len(r) == 2:
             t, m = r
-            if isinstance(t, int) and t>=100 and t<600:
+            if isinstance(t, int) and t >= 100 and t < 600:
                 return web.Response(t, str(m))
         # default:
         resp = web.Response(body=str(r).encode('utf-8'))
@@ -238,10 +260,11 @@ async def auth_factory(app, handler):
                 if user:
                     logging.info('set current user: %s' % user.email)
                     request.__user__ = user
-            if request.path.startswith('/manage/') and (request.__user__ is None or     not request.__user__.admin):
+            if request.path.startswith('/manage/') and (request.__user__ is None or not request.__user__.admin):
                 return web.HTTPFound('/login')
         return await handler(request)
     return auth_middleware
+
 
 def user2cookie(user, max_age):
     '''
@@ -260,7 +283,7 @@ async def cookie2user(cookie_str):
         return None
     try:
         L = cookie_str.split('-')
-        if len(L) !=3:
+        if len(L) != 3:
             return None
         uid, expires, sha1 = L
         if int(expires) < time.time():
@@ -278,10 +301,12 @@ async def cookie2user(cookie_str):
         logging.exception(e)
         return None
 
+
 class Page(object):
     '''
     Page object for display pages.
     '''
+
     def __init__(self, item_count, page_index=1, item_page=10, page_show=3):
         '''
         Init Pagination by item_count, page_index and item_page.
@@ -311,7 +336,7 @@ class Page(object):
         self.item_count = item_count
         self.item_page = item_page
         self.page_count = item_count // item_page + (1 if item_count % item_page > 0 else 0)
-        self.page_show = page_show - 2 # 去掉始终显示的首页和末页的两项
+        self.page_show = page_show - 2    # 去掉始终显示的首页和末页的两项
         if (item_count == 0) or (page_index > self.page_count):
             self.offset = 0
             self.limit = 0
@@ -323,10 +348,9 @@ class Page(object):
         self.has_next = self.page_index < self.page_count
         self.has_pre = self.page_index > 1
 
-
     def __str__(self):
         return 'item_count: %s, page_count: %s, page_index: %s, item_page: %s, offset: %s, limit: %s' % \
-                (self.item_count, self.page_count, self.page_index, self.item_page, self.offset, self.limit)
+            (self.item_count, self.page_count, self.page_index, self.item_page, self.offset, self.limit)
 
     __repr__ = __str__
 
@@ -355,6 +379,7 @@ class Page(object):
                 left = right - self.page_show
         # 生成的列表不含首页和末页
         self.pagelist = list(range(left, right))
+
 
 def text2html(text):
     lines = map(lambda s: '<p>%s</p>' % s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'),

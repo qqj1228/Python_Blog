@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
 # coding:utf-8
 
-import os, sys, time, subprocess
+import os
+import sys
+import time
+import subprocess
 
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
+
 def log(s):
     print('[Monitor] %s' % s)
 
+
 class MyFileSystemEventHandler(FileSystemEventHandler):
+
     def __init__(self, fn):
         super().__init__()
         self.restart = fn
@@ -22,6 +28,7 @@ class MyFileSystemEventHandler(FileSystemEventHandler):
 command = ['echo', 'ok']
 process = None
 
+
 def kill_process():
     global process
     if process:
@@ -31,14 +38,17 @@ def kill_process():
         log('Process ended with code %s.' % process.returncode)
         process = None
 
+
 def start_process():
     global process, command
     log('Start process %s...' % ' '.join(command))
     process = subprocess.Popen(command, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
+
 def restart_process():
     kill_process()
     start_process()
+
 
 def start_watch(path, callback):
     observer = Observer()
@@ -52,6 +62,7 @@ def start_watch(path, callback):
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
+
 
 if __name__ == '__main__':
     argv = sys.argv[1:]

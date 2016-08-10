@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 # coding:utf-8
 
-import json, os
+import json
+import os
+
 
 class DotDict(dict):
     '''
     Simple dict but support access as x.y style.
     '''
+
     def __init__(self, names=(), values=(), **kw):
         super().__init__(**kw)
         for k, v in zip(names, values):
@@ -21,6 +24,7 @@ class DotDict(dict):
     def __setattr__(self, key, value):
         self[key] = value
 
+
 def merge(default, user):
     r = {}
     for k, v in default.items():
@@ -33,6 +37,7 @@ def merge(default, user):
             r[k] = v
     return r
 
+
 def toDotDict(d):
     D = DotDict()
     for k, v in d.items():
@@ -41,8 +46,9 @@ def toDotDict(d):
 
 path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config')
 
+
 # 因json不支持注释，故每读取一行判断是否为注释，最后再转换json
-with open(path+'/default.cfg', 'r') as fp:
+with open(path + '/default.cfg', 'r') as fp:
     s = ''
     for line in fp.readlines():
         if line.strip().startswith('//'):
@@ -51,7 +57,7 @@ with open(path+'/default.cfg', 'r') as fp:
     configs = json.loads(s)
 
 try:
-    with open(path+'/user.cfg', 'r') as fp:
+    with open(path + '/user.cfg', 'r') as fp:
         s = ''
         for line in fp.readlines():
             if line.strip().startswith('//'):
