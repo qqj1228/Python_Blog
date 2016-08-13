@@ -468,6 +468,17 @@ $(function() {
     }
 });
 
+$(function() {
+    $(window).scroll(function() {
+        if($(this).scrollTop() >= $(this).height()) {
+            $(".goto-top").fadeIn();
+        }
+        else {
+            $(".goto-top").fadeOut();
+        }
+    });
+});
+
 function _display_error($obj, err) {
     if ($obj.is(':visible')) {
         $obj.hide();

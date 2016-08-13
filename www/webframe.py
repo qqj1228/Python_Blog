@@ -17,6 +17,8 @@ from APIError import APIError
 from configloader import configs
 from model import User
 
+logging.basicConfig(level=logging.INFO)
+
 
 def get(path):
     '''

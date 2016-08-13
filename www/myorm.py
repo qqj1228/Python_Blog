@@ -5,6 +5,8 @@ import logging
 
 import aiomysql
 
+logging.basicConfig(level=logging.INFO)
+
 
 def logSQL(sql, arg=()):
     logging.info('SQL: %s (arg: %s)' % (sql, arg))

@@ -15,6 +15,8 @@ from model import next_id, User, Blog, Comment, Category
 from configloader import configs
 from APIError import APIError, APIValueError, APIPermissionError, APIResourceNotFoundError
 
+logging.basicConfig(level=logging.INFO)
+
 
 @get('/')
 async def index(request, *, page='1'):
