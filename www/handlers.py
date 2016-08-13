@@ -43,6 +43,16 @@ async def index(request, *, page='1'):
     }
 
 
+@get('/about')
+async def about():
+    cats = await Category.findAll(orderBy='created_at desc')
+    return {
+        '__template__': 'about.html',
+        'web_meta': configs.web_meta,
+        'cats': cats
+    }
+
+
 @get('/signup')
 async def signin():
     cats = await Category.findAll(orderBy='created_at desc')

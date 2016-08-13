@@ -471,12 +471,28 @@ $(function() {
 $(function() {
     $(window).scroll(function() {
         if($(this).scrollTop() >= $(this).height()) {
-            $(".goto-top").fadeIn();
+            $('.goto-top').fadeIn();
         }
         else {
-            $(".goto-top").fadeOut();
+            $('.goto-top').fadeOut();
         }
     });
+});
+
+$(function() {
+    var navItem = $('#navbar ul.uk-navbar-nav.uk-hidden-small li');
+    var i = 0;
+    // i从1开始，跳过第一个href＝"/"导航菜单项
+    for (i = 1; i < navItem.length; i++) {
+        var a = $(navItem[i]).find('a');
+        if (location.pathname.indexOf(a.attr('href')) != -1) {
+            $(navItem[i]).addClass('uk-active');
+            break;
+        }
+    }
+    if (i == navItem.length) {
+        $(navItem[0]).addClass('uk-active');
+    }
 });
 
 function _display_error($obj, err) {
