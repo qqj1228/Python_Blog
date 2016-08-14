@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}{{ blog.title }}{% endblock %}
 {% block script %}
-<!-- pygment css -->
-<link rel="stylesheet" href="/static/css/monokai.css">
-
 <script type="text/javascript">
     var comment_url = '/api/blogs/{{ blog.id }}/comments';
     $(function () {
