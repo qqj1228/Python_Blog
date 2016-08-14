@@ -31,7 +31,7 @@ async def index(request, *, page='1'):
     else:
         blogs = await Blog.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
         for blog in blogs:
-            blog.html_summary = markdown(blog.summary)
+            blog.html_summary = markdown(blog.summary, extras=['code-friendly', 'fenced-code-blocks'])
     return {
         '__template__': 'index.html',
         'web_meta': configs.web_meta,
@@ -89,8 +89,8 @@ async def get_blog(id, request):
     blog = await Blog.find(id)
     comments = await Comment.findAll('blog_id=?', [id], orderBy='created_at desc')
     for c in comments:
-        c.html_content = markdown(c.content)
-    blog.html_content = markdown(blog.content)
+        c.html_content = markdown(c.content, extras=['code-friendly', 'fenced-code-blocks'])
+    blog.html_content = markdown(blog.content, extras=['code-friendly', 'fenced-code-blocks'])
     return {
         '__template__': 'blog.html',
         'web_meta': configs.web_meta,
@@ -130,7 +130,7 @@ async def get_category(id, request, *, page='1'):
     else:
         blogs = await Blog.findAll('cat_id=?', [id], orderBy='created_at desc', limit=(p.offset, p.limit))
         for blog in blogs:
-            blog.html_summary = markdown(blog.summary)
+            blog.html_summary = markdown(blog.summary, extras=['code-friendly', 'fenced-code-blocks'])
     return {
         '__template__': 'category.html',
         'web_meta': configs.web_meta,
