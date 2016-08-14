@@ -31,7 +31,7 @@ async def index(request, *, page='1'):
     else:
         blogs = await Blog.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
         for blog in blogs:
-            blog.html_summary = markdown(blog.summary, htlm4tags=True, extras=['code-friendly', 'fenced-code-blocks'])
+            blog.html_summary = markdown(blog.summary, html4tags=True, extras=['code-friendly', 'fenced-code-blocks'])
     return {
         '__template__': 'index.html',
         'web_meta': configs.web_meta,
