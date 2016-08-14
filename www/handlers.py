@@ -31,7 +31,7 @@ async def index(request, *, page='1'):
     else:
         blogs = await Blog.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
         for blog in blogs:
-            blog.html_summary = markdown(blog.summary, html4tags=True, extras=['code-friendly', 'fenced-code-blocks'])
+            blog.html_summary = markdown(blog.summary, extras=['code-friendly', 'fenced-code-blocks'])
     return {
         '__template__': 'index.html',
         'web_meta': configs.web_meta,
@@ -44,11 +44,13 @@ async def index(request, *, page='1'):
 
 
 @get('/about')
-async def about():
+async def about(request):
+    user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
     return {
         '__template__': 'about.html',
         'web_meta': configs.web_meta,
+        'user': user,
         'cats': cats
     }
 
@@ -89,8 +91,8 @@ async def get_blog(id, request):
     blog = await Blog.find(id)
     comments = await Comment.findAll('blog_id=?', [id], orderBy='created_at desc')
     for c in comments:
-        c.html_content = markdown(c.content, html4tags=True, extras=['code-friendly', 'fenced-code-blocks'])
-    blog.html_content = markdown(blog.content, html4tags=True, extras=['code-friendly', 'fenced-code-blocks'])
+        c.html_content = markdown(c.content, extras=['code-friendly', 'fenced-code-blocks'])
+    blog.html_content = markdown(blog.content, extras=['code-friendly', 'fenced-code-blocks'])
     return {
         '__template__': 'blog.html',
         'web_meta': configs.web_meta,
@@ -130,7 +132,7 @@ async def get_category(id, request, *, page='1'):
     else:
         blogs = await Blog.findAll('cat_id=?', [id], orderBy='created_at desc', limit=(p.offset, p.limit))
         for blog in blogs:
-            blog.html_summary = markdown(blog.summary, html4tags=True, extras=['code-friendly', 'fenced-code-blocks'])
+            blog.html_summary = markdown(blog.summary, extras=['code-friendly', 'fenced-code-blocks'])
     return {
         '__template__': 'category.html',
         'web_meta': configs.web_meta,
@@ -384,10 +386,12 @@ async def api_create_blog(request, *, title, summary, content, cat_name):
         raise APIPermissionError()
     if not title or not title.strip():
         raise APIValueError('title', 'Title can not be empty.')
-    if not content or not content.strip():
-        raise APIValueError('content', 'Content can not be empty.')
     if not summary or not summary.strip():
         summary = content.strip()[:200]
+    elif len(summary.strip()) > 200:
+        raise APIValueError('summary', 'Length of summary can not be larger than 200.')
+    if not content or not content.strip():
+        raise APIValueError('content', 'Content can not be empty.')
     if not cat_name.strip():
         cat_id = None
     else:
@@ -406,10 +410,12 @@ async def api_update_blog(id, request, *, title, summary, content, cat_name):
         raise APIPermissionError()
     if not title or not title.strip():
         raise APIValueError('title', 'Title can not be empty.')
-    if not content or not content.strip():
-        raise APIValueError('content', 'Content can not be empty.')
     if not summary or not summary.strip():
         summary = content.strip()[:200]
+    elif len(summary.strip()) > 200:
+        raise APIValueError('summary', 'Length of summary can not be larger than 200.')
+    if not content or not content.strip():
+        raise APIValueError('content', 'Content can not be empty.')
     blog = await Blog.find(id)
     blog.title = title.strip()
     blog.summary = summary.strip()
