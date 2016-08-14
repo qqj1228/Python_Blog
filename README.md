@@ -11,6 +11,7 @@
 - markdown2
 - watchdog（开发环境使用）
 - pygments
+- [pygments css](https://github.com/richleland/pygments-css)
 
 ## 增加修改的主要功能
 
