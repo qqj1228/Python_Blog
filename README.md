@@ -10,6 +10,7 @@
 - aiohttp
 - markdown2
 - watchdog（开发环境使用）
+- pygments
 
 ## 增加修改的主要功能
 
