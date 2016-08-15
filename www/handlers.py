@@ -49,9 +49,6 @@ async def about(request):
     cats = await Category.findAll(orderBy='created_at desc')
     blog = await Blog.findAll('title=?', ['__about__'])
     logging.info('blog: %s' % blog)
-    comments = await Comment.findAll('blog_id=?', [blog[0].id], orderBy='created_at desc')
-    for c in comments:
-        c.html_content = markdown(c.content, extras=['code-friendly', 'fenced-code-blocks'])
     blog[0].html_content = markdown(blog[0].content, extras=['code-friendly', 'fenced-code-blocks'])
     return {
         '__template__': 'about.html',
@@ -59,8 +56,6 @@ async def about(request):
         'user': user,
         'cats': cats,
         'blog': blog[0],
-        'comments': comments,
-        'disqus': configs.use_disqus
     }
 
 
