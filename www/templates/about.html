@@ -1,28 +1,109 @@
 {% extends 'base.html' %}
 {% block title %}关于本站{% endblock %}
+{% block script %}
+<script type="text/javascript">
+    var comment_url = '/api/blogs/{{ blog.id }}/comments';
+    $(function () {
+        var $form = $('#form-comment');
+        $form.submit(function (e) {
+            e.preventDefault();
+            $form.showFormError('');
+            var content = $form.find('textarea').val().trim();
+            if (content==='') {
+                return $form.showFormError('请输入评论内容！');
+            }
+            $form.postJSON(comment_url, { content: content }, function (err, result) {
+                if (err) {
+                    return $form.showFormError(err);
+                }
+                refresh();
+            });
+        });
+    });
+</script>
+{% endblock %}
 {% block content %}
-<article class="uk-article">
-    <h1 class="uk-article-title">
-        <p>关于本站</p>
-    </h1>
-    <p>这是一个用python3写的个人博客网站，使用了python3的异步模型。</p>
-    <p>这里用来记录我学习编程过程中的点滴和感悟，代码托管在<a target="_blank" href="https://github.com/qqj1228/Python_Blog">Github</a>上，欢迎同大家交流。</p>
-    <p>本站的评论系统采用Disqus，国内用户可能需要翻墙才能使用。</p>
-    <h2>打个广告</h2>
-    <p>本站空间提供商使用的是Digital Ocean，性价比不错，国内访问速度尚可，有兴趣的同学可以通过以下链接注册试用。</p>
-    <p><a target="_blank" href="https://m.do.co/c/5bed760ea510">https://m.do.co/c/5bed760ea510</a></p>
-    <p>通过以上链接注册试用的话可以便宜10美刀，我也可以可到回馈，一举两得。照例他也是支持30天退款的，大家可以放心试用。</p>
-    <h2>开发日志</h2>
-    <h3>2016-8-14</h3>
-    <p>1、加入缺失的about页面</p>
-    <p>2、加入代码语法高亮，使用markdown2的“fenced-code-blocks”扩展来实现。其是在后台调用pygments实现功能的。但是对于bash着色上存在bug，目前先使用浅色主题</p>
-    <h3>2016-8-13</h3>
-    <p>在网站页面里加入回到顶部功能</p>
-    <h3>2016-8-11</h3>
-    <p>网站代码按照PEP8要求规范化。</p>
-    <h3>2016-8-9</h3>
-    <p>加入文章评论数显示功能。</p>
-    <h3>2016-8-6</h3>
-    <p>网站初版上线。</p>
-</article>
+    <!-- blog -->
+    <article class="uk-article">
+        <h1 class="uk-article-title">关于本站</h1>
+        <p>{{ blog.html_content|safe }}</p>
+    </article>
+    <!-- end blog -->
+
+    <!-- comments -->
+    {% if disqus %}
+        <hr class="uk-article-divider">
+        <p class="uk-article-meta">本站使用Disqus评论系统，国内用户可能需要|翻|墙|才能访问</p>
+        <!-- disqus comments -->
+        <div id="disqus_thread"></div>
+        <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+         */
+
+        var disqus_config = function () {
+            this.page.url = '{{ web_meta.base_url }}' + '/blog/{{ blog.id }}';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = '{{ blog.id }}'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() {  // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+
+            s.src = '//cashqian.disqus.com/embed.js';
+
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    {% else %}
+        <!-- native comments -->
+        {% if user %}
+        <div class="uk-panel uk-panel-box uk-panel-header uk-panel-box-primary">
+            <h3 class="uk-panel-title">发表评论</h3>
+            <article class="uk-comment">
+                <header class="uk-comment-header">
+                    <img class="uk-comment-avatar uk-border-circle" width="50" height=" 50" src="{{ user.image }}">
+                    <h4 class="uk-comment-title">{{ user.name }}</h4>
+                </header>
+                <div class="uk-comment-body">
+                    <form id="form-comment" class="uk-form">
+                        <div class="uk-alert uk-alert-danger uk-hidden"></div>
+                        <div class="uk-form-row">
+                            <textarea class="uk-width-1-1" rows="6" placeholder="说点什么吧"></textarea>
+                        </div>
+                        <div class="uk-form-row">
+                            <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-comment"></i> 发表评论</button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+        </div>
+        <hr class="uk-article-divider">
+        {% endif %}
+        <div class="uk-panel uk-panel-box uk-panel-header uk-panel-box-primary">
+            <h3 class="uk-panel-title">用户评论</h3>
+            <ul class="uk-comment-list">
+            {% for comment in comments %}
+                <li>
+                    <article id="{{ comment.id }}" class="uk-comment">
+                        <header class="uk-comment-header">
+                            <img class="uk-comment-avatar uk-border-circle" width="50" height="50" src="{{ comment.user_image }}">
+                            <h4 class="uk-comment-title">{{ comment.user_name }} {% if comment.user_id==blog.user_id %}(作者){% endif %}</h4>
+                            <p class="uk-comment-meta">{{ comment.created_at|deltatime  }}</p>
+                        </header>
+                        <div class="uk-comment-body">
+                        {{ comment.html_content|safe }}
+                        </div>
+                    </article>
+                    <hr class="uk-article-divider">
+                </li>
+            {% else %}
+                <p>还没有人评论...</p>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <!-- end comments -->
 {% endblock %}

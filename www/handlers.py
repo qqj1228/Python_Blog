@@ -23,13 +23,13 @@ async def index(request, *, page='1'):
     user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
     page_index = Page.page2int(page)
-    num = await Blog.findNumber('*')
+    num = await Blog.findNumber('*') - 1    # 去掉__about__页面
     p = Page(num, page_index, item_page=configs.blog_item_page, page_show=configs.page_show)
     p.pagelist()
     if num == 0:
         blogs = []
     else:
-        blogs = await Blog.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
+        blogs = await Blog.findAll('title<>?', ['__about__'], orderBy='created_at desc', limit=(p.offset, p.limit))
         for blog in blogs:
             blog.html_summary = markdown(blog.summary, extras=['code-friendly', 'fenced-code-blocks'])
     return {
@@ -47,11 +47,20 @@ async def index(request, *, page='1'):
 async def about(request):
     user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
+    blog = await Blog.findAll('title=?', ['__about__'])
+    logging.info('blog: %s' % blog)
+    comments = await Comment.findAll('blog_id=?', [blog[0].id], orderBy='created_at desc')
+    for c in comments:
+        c.html_content = markdown(c.content, extras=['code-friendly', 'fenced-code-blocks'])
+    blog[0].html_content = markdown(blog[0].content, extras=['code-friendly', 'fenced-code-blocks'])
     return {
         '__template__': 'about.html',
         'web_meta': configs.web_meta,
         'user': user,
-        'cats': cats
+        'cats': cats,
+        'blog': blog[0],
+        'comments': comments,
+        'disqus': configs.use_disqus
     }
 
 
@@ -420,10 +429,11 @@ async def api_update_blog(id, request, *, title, summary, content, cat_name):
     blog.title = title.strip()
     blog.summary = summary.strip()
     blog.content = content.strip()
-    blog.cat_name = cat_name.strip()
-    if not cat_name.strip():
+    if not cat_name or not cat_name.strip():
+        blog.cat_name = None
         blog.cat_id = None
     else:
+        blog.cat_name = cat_name.strip()
         cats = await Category.findAll('name=?', [cat_name.strip()])
         if (len(cats) == 0):
             raise APIValueError('cat_name', 'cat_name is not belong to Category.')

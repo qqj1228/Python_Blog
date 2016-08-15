@@ -189,7 +189,7 @@ class Model(dict, metaclass=ModelMetaclass):
 
     @classmethod
     async def findAll(cls, where=None, args=None, **kw):
-        'find objects by where clause'
+        'find objects by where clause, return value is a list'
         sql = [cls.__select__]
         if where:
             sql.append('where')
