@@ -22,6 +22,6 @@
 5. 可选使用Disqus评论系统
 6. 使用JSON格式配置文件，并支持注释
 7. 完善程序退出机制，手工退出不会报错
-8. 代码高亮，gfm风格的markdown代码编辑
+8. 代码高亮，gfm风格的markdown代码块
 
 上线效果[www.cashqian.net](http://www.cashqian.net)
