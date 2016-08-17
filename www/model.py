@@ -4,7 +4,7 @@
 import time
 import uuid
 
-from myorm import Model, StringField, BoolField, FloatField, TextField
+from myorm import Model, StringField, BoolField, FloatField, TextField, IntField
 
 
 def next_id():
@@ -30,6 +30,7 @@ class Blog(Model):
     user_image = StringField(col_type='varchar(500)')
     cat_id = StringField(col_type='varchar(50)')
     cat_name = StringField(col_type='varchar(50)')
+    view_count = IntField()
     title = StringField(col_type='varchar(50)')
     summary = StringField(col_type='varchar(200)')
     content = TextField()

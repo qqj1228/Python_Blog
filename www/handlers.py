@@ -93,6 +93,8 @@ async def get_blog(id, request):
     user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
     blog = await Blog.find(id)
+    blog.view_count = blog.view_count + 1
+    await blog.update()
     comments = await Comment.findAll('blog_id=?', [id], orderBy='created_at desc')
     for c in comments:
         c.html_content = markdown(c.content, extras=['code-friendly', 'fenced-code-blocks'])

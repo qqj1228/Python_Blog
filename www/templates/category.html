@@ -21,7 +21,8 @@
             <p>{{ blog.html_summary|safe }}</p>
             <p class="uk-article-meta">
                 <span>由 <a href="/user/{{ blog.user_id }}">{{ blog.user_name }}</a> 发表于 {{ blog.created_at|deltatime}} </span>
-                <span class="uk-icon-comment"></span>
+                | <i class="uk-icon-eye"></i> {{ blog.view_count }} 次阅读
+                | <span class="uk-icon-comment"></span>
                 {% if disqus %}
                 <span class="disqus-comment-count" data-disqus-identifier="{{ blog.id }}">评论数...</span>
                 {% else %}

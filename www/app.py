@@ -41,7 +41,7 @@ def init_jinja2(app, **kw):
 
 def deltatime_filter(t):
     '''
-    jinjia2自定义过滤器
+    jinja2自定义过滤器
     '''
     delta = int(time.time() - t)
     if delta < 60:
