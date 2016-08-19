@@ -462,15 +462,10 @@ $(function () {
     });
 });
 
-$(function() {
-    if (location.pathname === '/' || location.pathname.indexOf('/blog')===0) {
-        $('li[data-url=blogs]').addClass('uk-active');
-    }
-});
-
+// 回到顶端按钮出现和消失效果的实现
 $(function() {
     $(window).scroll(function() {
-        if($(this).scrollTop() >= $(this).height()) {
+        if($(this).scrollTop() >= $(this).height()/2) {
             $('.goto-top').fadeIn();
         }
         else {
@@ -479,6 +474,7 @@ $(function() {
     });
 });
 
+// 导航栏菜单项自动设置选中状态
 $(function() {
     var navItem = $('#navbar ul.uk-navbar-nav.uk-hidden-small li');
     var i = 0;

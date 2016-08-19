@@ -6,10 +6,62 @@
     display: none;
 }
 
+/* UIkit component modifiers
+ ========================================================================== */
+
+/*
+ * Navbar
+ */
+
+.tm-navbar {
+    padding: 15px 0;
+    border: none;
+    background: #000;
+}
+
+.tm-navbar .uk-navbar-content,
+.tm-navbar .uk-navbar-brand,
+.tm-navbar .uk-navbar-toggle {
+    height: 40px;
+    margin-top: 0;
+    text-shadow: none;
+    color: #666;
+}
+
+.tm-navbar .uk-navbar-nav > li > a {
+    height: 40px;
+    margin: 0;
+    border: none;
+    border-radius: 3px !important;
+    color: #666;
+    text-shadow: none;
+    font-size: 15px;
+}
+
+.tm-navbar .uk-navbar-nav > li { margin-left: 20px; }
+
+/* Hover */
+.tm-navbar .uk-navbar-nav > li:hover > a,
+.tm-navbar .uk-navbar-nav > li > a:focus,
+.tm-navbar .uk-navbar-nav > li.uk-open > a {
+    background-color: transparent;
+    border: none;
+    color: #FFF;
+}
+
+/* Active */
+.tm-navbar .uk-navbar-nav > li.uk-active > a {
+    background-color: #2BA3D4;
+    color: #FFF;
+}
+
+/* OnClick */
+.tm-navbar .uk-navbar-nav > li > a:active { background-color: transparent; }
+
 /* pygments css monokai theme */
 td.linenos { background-color: #f0f0f0; padding-right: 10px; }
 span.lineno { background-color: #f0f0f0; padding: 0 5px 0 5px; }
-pre  { line-height: 125%; background: #272822; color: #f8f8f2 }
+pre { line-height: 125%; background: #272822; color: #f8f8f2 }
 .codehilite .hll { background-color: #49483e }
 .codehilite .c { color: #75715e } /* Comment */
 .codehilite .err { color: #960050; background-color: #1e0010 } /* Error */
