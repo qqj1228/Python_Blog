@@ -96,12 +96,14 @@
         <!-- end menu -->
 
         <div class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
-            <div class="uk-grid" data-uk-grid-margin="">
+            <div class="uk-grid" data-uk-grid-margin>
                 <div class="uk-width-medium-3-4 uk-row-first">
+                    <div class="uk-panel uk-panel-box uk-panel-box-secondary">
                     <!-- content -->
                     {% block content %}
                     {% endblock %}
                     <!-- end content -->
+                    </div>
                 </div>
 
                 <!-- sidebar -->
@@ -111,7 +113,7 @@
                         <h3>{{ web_meta.web_name }}</h3>
                         <p>{{ web_meta.welcome_message }}</p>
                     </div>
-                    <div class="uk-panel">
+                    <div class="uk-panel uk-panel-box">
                         <h3 class="uk-panel-title">文章分类</h3>
                         <ul class="uk-list uk-list-line">
                             {% for cat in cats %}
@@ -119,7 +121,7 @@
                             {% endfor %}
                         </ul>
                     </div>
-                    <div class="uk-panel">
+                    <div class="uk-panel uk-panel-box">
                         <h3 class="uk-panel-title">友情链接</h3>
                         <ul class="uk-list">
                             <li><a target="_blank" href="https://github.com">GitHub</a></li>
@@ -137,16 +139,12 @@
         <div id="offcanvas" class="uk-offcanvas">
             <div class="uk-offcanvas-bar">
                 <ul class="uk-nav uk-nav-offcanvas uk-nav-parent-icon" data-uk-nav>
-                    <li class="uk-active">
-                        <a href="/">博客</a>
-                    </li>
-                    <li>
-                        <a href="/about">关于</a>
-                    </li>
+                    <li><a href="/">博客</a></li>
+                    <li><a href="/about">关于</a></li>
                     <li class="uk-nav-divider"></li>
                     {% if user %}
                         <li class="uk-parent">
-                            <a href="#"><i class="uk-icon-user"></i> {{ user.name }}</a>
+                            <a href="#0"><i class="uk-icon-user"></i> {{ user.name }}</a>
                             <ul class="uk-nav-sub">
                                 <li><a href="/manage/blogs"><i class="uk-icon-gear"></i> 后台管理</a></li>
                                 <li><a href="/logout"><i class="uk-icon-sign-out"></i> 登出</a></li>

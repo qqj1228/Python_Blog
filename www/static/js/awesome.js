@@ -491,6 +491,23 @@ $(function() {
     }
 });
 
+// offcanvas导航栏菜单项自动设置选中状态
+$(function() {
+    var navItem = $('#offcanvas ul.uk-nav-offcanvas li');
+    var i = 0;
+    // i从1开始，跳过第一个href＝"/"导航菜单项
+    for (i = 1; i < navItem.length; i++) {
+        var a = $(navItem[i]).find('a');
+        if (location.pathname.indexOf(a.attr('href')) != -1) {
+            $(navItem[i]).addClass('uk-active');
+            break;
+        }
+    }
+    if (i == navItem.length) {
+        $(navItem[0]).addClass('uk-active');
+    }
+});
+
 function _display_error($obj, err) {
     if ($obj.is(':visible')) {
         $obj.hide();
