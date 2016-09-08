@@ -102,3 +102,8 @@ MANIFEST
 
 # VS Code
 .vscode/
+
+# 自定义忽略文件
+static/upload/
+static/images/
+config/user.cfg
