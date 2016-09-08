@@ -389,7 +389,7 @@ async def api_login(*, email, password, rememberme):
 @post('/api/create_blog')
 async def api_create_blog(request, *, title, summary, content, cat_name):
     if request.__user__ is None or not request.__user__.admin:
-        raise APIPermissionError()
+        raise APIPermissionError('Only admin can do this!')
     if not title or not title.strip():
         raise APIValueError('title', 'Title can not be empty.')
     if not summary or not summary.strip():
@@ -413,7 +413,7 @@ async def api_create_blog(request, *, title, summary, content, cat_name):
 @post('/api/blogs/{id}')
 async def api_update_blog(id, request, *, title, summary, content, cat_name):
     if request.__user__ is None or not request.__user__.admin:
-        raise APIPermissionError()
+        raise APIPermissionError('Only admin can do this!')
     if not title or not title.strip():
         raise APIValueError('title', 'Title can not be empty.')
     if not summary or not summary.strip():
@@ -442,7 +442,7 @@ async def api_update_blog(id, request, *, title, summary, content, cat_name):
 @post('/api/blogs/{id}/delete')
 async def api_delete_blog(request, *, id):
     if request.__user__ is None or not request.__user__.admin:
-        raise APIPermissionError()
+        raise APIPermissionError('Only admin can do this!')
     blog = await Blog.find(id)
     if blog is None:
         raise APIResourceNotFoundError('Blog')
@@ -454,7 +454,7 @@ async def api_delete_blog(request, *, id):
 async def api_create_comment(id, request, *, content):
     user = request.__user__
     if user is None or not user.admin:
-        raise APIPermissionError()
+        raise APIPermissionError('Only admin can do this!')
     if not content or not content.strip():
         raise APIValueError('comment', 'Comment can not be empty.')
     blog = await Blog.find(id)
@@ -468,7 +468,7 @@ async def api_create_comment(id, request, *, content):
 @post('/api/comments/{id}/delete')
 async def api_delete_comment(id, request):
     if request.__user__ is None or not request.__user__.admin:
-        raise APIPermissionError()
+        raise APIPermissionError('Only admin can do this!')
     comment = await Comment.find(id)
     if comment is None:
         raise APIResourceNotFoundError('Comment')
@@ -479,7 +479,7 @@ async def api_delete_comment(id, request):
 @post('/api/users/{id}/delete')
 async def api_delete_user(id, request):
     if request.__user__ is None or not request.__user__.admin:
-        raise APIPermissionError()
+        raise APIPermissionError('Only admin can do this!')
     user = await User.find(id)
     if user is None:
         raise APIResourceNotFoundError('User')
@@ -489,6 +489,8 @@ async def api_delete_user(id, request):
 
 @post('/upload')
 async def upload(request, *, file):
+    if request.__user__ is None or not request.__user__.admin:
+        raise APIPermissionError('Only admin can do this!')
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
     filename = path + '/upload/' + file.filename
     ext = os.path.splitext(filename)
@@ -506,7 +508,7 @@ async def upload(request, *, file):
 @post('/api/create_category')
 async def api_create_category(request, *, name):
     if request.__user__ is None or not request.__user__.admin:
-        raise APIPermissionError()
+        raise APIPermissionError('Only admin can do this!')
     if not name or not name.strip():
         raise APIValueError('name', 'Name can not be empty.')
     cat = Category(name=name.strip())
@@ -517,7 +519,7 @@ async def api_create_category(request, *, name):
 @post('/api/categories/{id}')
 async def api_update_category(id, request, *, name):
     if request.__user__ is None or not request.__user__.admin:
-        raise APIPermissionError()
+        raise APIPermissionError('Only admin can do this!')
     if not name or not name.strip():
         raise APIValueError('name', 'Name can not be empty.')
     cat = await Category.find(id)
@@ -529,7 +531,7 @@ async def api_update_category(id, request, *, name):
 @post('/api/categories/{id}/delete')
 async def api_delete_category(id, request):
     if request.__user__ is None or not request.__user__.admin:
-        raise APIPermissionError()
+        raise APIPermissionError('Only admin can do this!')
     cat = await Category.find(id)
     if cat is None:
         raise APIResourceNotFoundError('Category')
