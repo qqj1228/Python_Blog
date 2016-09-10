@@ -7,7 +7,7 @@
 <script type="text/javascript" src="http://cdn.staticfile.org/webuploader/0.1.5/webuploader.min.js"></script>
 <script type="text/javascript" src="/static/js/upload_image.js"></script>
 
-    <script type="text/javascript">
+<script type="text/javascript">
     var id = '{{ id }}';
     var action = '{{ action }}';
 
@@ -51,7 +51,7 @@
             });
         }
     });
-    </script>
+</script>
 {% endblock %}
 {% block content %}
     <div class="uk-width-1-1 uk-margin-bottom">
@@ -110,7 +110,16 @@
             <a href="/manage/blogs" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
         </div>
     </form>
-    <div id="uploader" class="uk-panel uk-panel-box">
+    <div class="uk-panel uk-panel-box uk-margin-top">
+        <h3 class="uk-panel-title">已上传图片:(插入路径:/static/upload/文件名)</h3>
+        {% for upload in uploadlist %}
+            <div class="uk-thumbnail uk-thumbnail-mini">
+                <img src="/static/upload/{{ upload }}" alt="{{ upload }}">
+                <div class="uk-thumbnail-caption">{{ upload }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    <div id="uploader" class="uk-panel uk-panel-box uk-margin-top">
         <h3 class="uk-panel-title">上传图片:(插入路径:/static/upload/文件名)</h3>
         <!--用来存放文件信息-->
         <div id="fileList" class=""></div>

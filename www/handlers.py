@@ -10,7 +10,7 @@ import os
 from aiohttp import web
 from markdown2 import markdown
 
-from webframe import get, post, user2cookie, Page
+from webframe import get, post, user2cookie, Page, filelist
 from model import next_id, User, Blog, Comment, Category
 from configloader import configs
 from APIError import APIError, APIValueError, APIPermissionError, APIResourceNotFoundError
@@ -249,13 +249,17 @@ async def manage_blogs_create(request):
 async def manage_blogs_edit(request, *, id):
     user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
+
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static/upload')
+    uploadlist = filelist(path)
     return {
         '__template__': 'manage_blog_edit.html',
         'web_meta': configs.web_meta,
         'user': user,
         'cats': cats,
         'id': id,
-        'action': '/api/blogs/%s' % id
+        'action': '/api/blogs/%s' % id,
+        'uploadlist': uploadlist
     }
 
 

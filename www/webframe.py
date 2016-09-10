@@ -384,7 +384,10 @@ class Page(object):
         self.pagelist = list(range(left, right))
 
 
-def text2html(text):
-    lines = map(lambda s: '<p>%s</p>' % s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'),
-                filter(lambda s: s.strip() != '', text.split('\n')))
-    return ''.join(lines)
+def filelist(dir):
+    filelist = []
+    l = os.listdir(dir)
+    for file in l:
+        if os.path.isfile(os.path.join(dir, file)) and not file.startswith('.'):
+            filelist.append(file)
+    return filelist
