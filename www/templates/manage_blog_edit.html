@@ -27,15 +27,24 @@
                         }
                     });
                 },
-                preview: function () {
-                    postJSON('/api/preview', {content: blog.content}, function(err, r) {
-                        if (err) {
-                            error(err);
-                        } else {
-                            $('#pre').html(r.preview);
-                        }
-                    });
-                }
+            },
+            ready: function () {
+                $('#dlg').on({
+                    'show.uk.modal': function(){
+                        postJSON('/api/preview', {content: blog.content}, function(err, r) {
+                            if (err) {
+                                error(err);
+                            } else {
+                                $('#preing').hide();
+                                $('#pre').html(r.preview);
+                            }
+                        });
+                    },
+                    'hide.uk.modal': function(){
+                        $('#preing').show();
+                        $('#pre').html('');
+                    }
+                });
             }
         });
         $('#vm').show();
@@ -116,7 +125,7 @@
         <div class="uk-form-row">
             <button class="uk-button uk-button-primary" type="submit"><i class="uk-icon-save"></i> 保存</button>
             <!--<button class="uk-button uk-button-primary" type="reset"><i class="uk-icon-repeat"></i> 重置</button>-->
-            <a v-on:click="preview" class="uk-button uk-button-primary" href="#dlg" data-uk-modal><i class="uk-icon-code"></i> 预览</a>
+            <a class="uk-button uk-button-primary" href="#dlg" data-uk-modal><i class="uk-icon-code"></i> 预览</a>
             <a href="/manage/blogs" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
         </div>
     </form>
@@ -145,6 +154,9 @@
             <a class="uk-modal-close uk-close"></a>
             <h2>预览文章内容</h2>
             <hr>
+                <div id="preing" class="uk-width-1-1 uk-text-center uk-margin-bottom">
+                    <span><i class="uk-icon-spinner uk-icon-medium uk-icon-spin"></i> 正在加载预览...</span>
+                </div>
             <div class="uk-overflow-container">
                 <p id="pre"></p>
             </div>
