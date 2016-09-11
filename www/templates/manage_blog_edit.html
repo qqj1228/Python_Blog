@@ -26,6 +26,15 @@
                             return location.assign('/manage/blogs');
                         }
                     });
+                },
+                preview: function () {
+                    postJSON('/api/preview', {content: blog.content}, function(err, r) {
+                        if (err) {
+                            error(err);
+                        } else {
+                            $('#pre').html(r.preview);
+                        }
+                    });
                 }
             }
         });
@@ -90,7 +99,7 @@
         <div class="uk-form-row">
             <label class="uk-form-label">文章内容:</label>
             <div class="uk-form-controls">
-                <textarea v-model="content" name="content" class="uk-width-1-1" rows="16" placeholder="文章内容（使用markdown语法）"></textarea>
+                <textarea id="content" v-model="content" name="content" class="uk-width-1-1" rows="16" placeholder="文章内容（使用markdown语法）"></textarea>
             </div>
         </div>
         <div class="uk-form-row">
@@ -106,7 +115,8 @@
         </div>
         <div class="uk-form-row">
             <button class="uk-button uk-button-primary" type="submit"><i class="uk-icon-save"></i> 保存</button>
-            <button class="uk-button uk-button-primary" type="reset"><i class="uk-icon-repeat"></i> 重置</button>
+            <!--<button class="uk-button uk-button-primary" type="reset"><i class="uk-icon-repeat"></i> 重置</button>-->
+            <a v-on:click="preview" class="uk-button uk-button-primary" href="#dlg" data-uk-modal><i class="uk-icon-code"></i> 预览</a>
             <a href="/manage/blogs" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
         </div>
     </form>
@@ -128,5 +138,16 @@
             <div class="uk-progress-bar"></div>
         </div>
         <div id="filePicker"><i class="uk-icon-file-image-o"></i> 选择图片</div>
+    </div>
+    <!--预览文章对话框-->
+    <div id="dlg" class="uk-modal">
+        <div class="uk-modal-dialog">
+            <a class="uk-modal-close uk-close"></a>
+            <h2>预览文章内容</h2>
+            <hr>
+            <div class="uk-overflow-container">
+                <p id="pre"></p>
+            </div>
+        </div>
     </div>
 {% endblock %}

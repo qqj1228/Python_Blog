@@ -541,3 +541,10 @@ async def api_delete_category(id, request):
         raise APIResourceNotFoundError('Category')
     await cat.remove()
     return dict(id=id)
+
+
+@post('/api/preview')
+async def preview(*, content):
+    logging.info('*************content:%s' % content)
+    preview = markdown(content, extras=['code-friendly', 'fenced-code-blocks'])
+    return dict(preview=preview)
