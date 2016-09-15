@@ -151,15 +151,15 @@ async def get_category(id, request, *, page='1'):
     }
 
 
-@get('/api/blogs/{id}')
-async def api_show_blogs(*, id):
+@get('/api/blog/{id}')
+async def api_blog(*, id):
     blog = await Blog.find(id)
     return blog
 
 
 # handler带有默认值的命名关键字参数，用来处理带有查询字符串的url
-@get('/api/blog')
-async def api_blog(*, page='1'):
+@get('/api/manage/blog')
+async def api_manage_blog(*, page='1'):
     page_index = Page.page2int(page)
     num = await Blog.findNumber('*')
     p = Page(num, page_index, item_page=configs.manage_item_page, page_show=configs.page_show)
@@ -170,8 +170,8 @@ async def api_blog(*, page='1'):
 
 
 # handler带有默认值的命名关键字参数，用来处理带有查询字符串的url
-@get('/api/comment')
-async def api_comment(*, page='1'):
+@get('/api/manage/comment')
+async def api_manage_comment(*, page='1'):
     page_index = Page.page2int(page)
     num = await Comment.findNumber('*')
     p = Page(num, page_index, item_page=configs.manage_item_page, page_show=configs.page_show)
@@ -182,8 +182,8 @@ async def api_comment(*, page='1'):
 
 
 # handler带有默认值的命名关键字参数，用来处理带有查询字符串的url
-@get('/api/user')
-async def api_get_user(*, page='1'):
+@get('/api/manage/user')
+async def api_manage_user(*, page='1'):
     page_index = Page.page2int(page)
     num = await User.findNumber('*')
     p = Page(num, page_index, item_page=configs.manage_item_page, page_show=configs.page_show)
@@ -196,8 +196,8 @@ async def api_get_user(*, page='1'):
 
 
 # handler带有默认值的命名关键字参数，用来处理带有查询字符串的url
-@get('/api/category')
-async def api_category(*, page='1'):
+@get('/api/manage/category')
+async def api_manage_category(*, page='1'):
     page_index = Page.page2int(page)
     num = await Category.findNumber('*')
     p = Page(num, page_index, item_page=configs.manage_item_page, page_show=configs.page_show)
@@ -207,8 +207,8 @@ async def api_category(*, page='1'):
     return dict(page=p, categories=categories)
 
 
-@get('/api/categories/{id}')
-async def api_show_categories(*, id):
+@get('/api/category/{id}')
+async def api_category(*, id):
     cat = await Category.find(id)
     return cat
 
@@ -227,7 +227,7 @@ async def manage_ajax(request, *, page='1'):
 
 
 @get('/manage/blog/create')
-async def manage_blogs_create(request):
+async def manage_blog_create(request):
     user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
     return {
@@ -241,7 +241,7 @@ async def manage_blogs_create(request):
 
 
 @get('/manage/blog/edit')
-async def manage_blogs_edit(request, *, id):
+async def manage_blog_edit(request, *, id):
     user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
 
@@ -500,7 +500,7 @@ async def api_delete_category(id, request):
 
 
 @post('/api/preview')
-async def preview(*, content):
+async def api_preview(*, content):
     logging.info('*************content:%s' % content)
     preview = markdown(content, extras=['code-friendly', 'fenced-code-blocks'])
     return dict(preview=preview)

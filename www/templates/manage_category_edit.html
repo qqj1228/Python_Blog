@@ -17,7 +17,7 @@
                         if (err) {
                             $form.showFormError(err);
                         } else {
-                            return location.assign('/manage/categories');
+                            return location.assign('/manage');
                         }
                     });
                 }
@@ -28,7 +28,7 @@
 
     $(function () {
         if (id) {
-            getJSON('/api/categories/' + id, function (err, category) {
+            getJSON('/api/category/' + id, function (err, category) {
                 if (err) {
                     return fatal(err);
                 }

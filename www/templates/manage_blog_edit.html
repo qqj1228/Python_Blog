@@ -23,7 +23,7 @@
                         if (err) {
                             $form.showFormError(err);
                         } else {
-                            return location.assign('/manage/blogs');
+                            return location.assign('/manage');
                         }
                     });
                 },
@@ -52,7 +52,7 @@
 
     $(function () {
         if (id) {
-            getJSON('/api/blogs/' + id, function (err, blog) {
+            getJSON('/api/blog/' + id, function (err, blog) {
                 if (err) {
                     return fatal(err);
                 }

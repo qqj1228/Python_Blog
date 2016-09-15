@@ -13,7 +13,7 @@ function initVM() {
             setItems: function (p) {
                 var self = this;
                 $('#loading').show();
-                getJSON('/api/' + this.table, { page: p }, function (err, res) {
+                getJSON('/api/manage/' + this.table, { page: p }, function (err, res) {
                     if (err) {
                         return fatal(err);
                     }
@@ -76,12 +76,30 @@ function initVM() {
                 location.assign('/manage/' + this.table + '/edit?id=' + item.id);
             },
             delete_item: function (item) {
-                if (confirm('确认要删除“' + item.title + '”？删除后不可恢复！')) {
+                var name;
+                switch (this.table) {
+                    case 'blog':
+                        name = item.title;
+                        break;
+                    case 'comment':
+                        name = item.content.substring(0, 40);
+                        break;
+                    case 'user':
+                        name = item.name
+                        break;
+                    case 'category':
+                        name = item.name
+                        break;
+                    default:
+                        name = '';
+                        break;
+                }
+                if (confirm('确认要删除“' + name + '”？删除后不可恢复！')) {
                     postJSON('/api/' + this.table + '/' + item.id + '/delete', function (err, r) {
                         if (err) {
                             return error(err);
                         }
-                        refresh();
+                        location.reload();
                     });
                 }
             }
