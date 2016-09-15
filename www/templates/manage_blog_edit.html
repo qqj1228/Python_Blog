@@ -72,19 +72,7 @@
 </script>
 {% endblock %}
 {% block content %}
-    <div class="uk-width-1-1 uk-margin-bottom">
-        <div class="uk-panel uk-panel-box">
-            <ul class="uk-breadcrumb">
-                <li><a href="/manage/blogs">文章管理</a></li>
-                <li><a href="/manage/comments">本地评论管理</a></li>
-                <li><a href="/manage/users">用户管理</a></li>
-                <li><a href="/manage/categories">分类管理</a></li>
-            </ul>
-        </div>
-    </div>
-
-    <div id="error" class="uk-width-1-1">
-    </div>
+    <div id="error" class="uk-width-1-1"></div>
 
     <div id="loading" class="uk-width-1-1 uk-text-center uk-margin-bottom">
         <span><i class="uk-icon-spinner uk-icon-medium uk-icon-spin"></i> 正在加载...</span>
@@ -126,7 +114,7 @@
             <button class="uk-button uk-button-primary" type="submit"><i class="uk-icon-save"></i> 保存</button>
             <!--<button class="uk-button uk-button-primary" type="reset"><i class="uk-icon-repeat"></i> 重置</button>-->
             <a class="uk-button uk-button-primary" href="#dlg" data-uk-modal><i class="uk-icon-code"></i> 预览</a>
-            <a href="/manage/blogs" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
+            <a href="/manage" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
         </div>
     </form>
     <div class="uk-panel uk-panel-box uk-margin-top">

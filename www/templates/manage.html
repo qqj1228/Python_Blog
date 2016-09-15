@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}文章管理{% endblock %}
+{% block script %}
+<script src="/static/js/manage.js"></script>
+{% endblock %}
+{% block content %}
+<div id="vm">
+    <div class="uk-width-1-1 uk-margin-bottom">
+        <nav class="uk-navbar">
+            <ul class="uk-navbar-nav">
+                <li id="nav_blog" class="uk-active"><a v-on:click="nav_blog">文章管理</a></li>
+                <li id="nav_cmt"><a v-on:click="nav_cmt">本地评论管理</a></li>
+                <li id="nav_user"><a v-on:click="nav_user">用户管理</a></li>
+                <li id="nav_cat"><a v-on:click="nav_cat">分类管理</a></li>
+            </ul>
+            <div class="uk-navbar-content uk-navbar-flip">
+                <a  id="create_btn" href="/manage/blog/create" class="uk-button uk-button-primary"><i class="uk-icon-plus"></i> 新建文章</a>
+            </div>
+        </nav>
+    </div>
+
+    <div id="error" class="uk-width-1-1"></div>
+
+    <div id="loading" class="uk-width-1-1 uk-text-center uk-margin-bottom uk-position-z-index">
+        <span><i class="uk-icon-spinner uk-icon-medium uk-icon-spin"></i> 正在加载...</span>
+    </div>
+
+    <div class="uk-width-1-1">
+        <table v-if:="'blog' == table" class="uk-table uk-table-hover uk-table-striped uk-overflow-container">
+            <thead>
+                <tr>
+                    <th class="uk-width-4-10">标题</th>
+                    <th class="uk-width-2-10">作者</th>
+                    <th class="uk-width-3-10">创建时间</th>
+                    <th class="uk-width-1-10">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in items" track-by="id">
+                    <td><a target="_blank" v-bind:href="'/blog/'+item.id" v-text="item.title"></a></td>
+                    <td><a target="_blank" v-bind:href="'/user/'+item.user_id" v-text="item.user_name"></a></td>
+                    <td><span v-text="item.created_at.toDateTime()"></span></td>
+                    <td>
+                        <div class="uk-button-group">
+                            <a v-on:click="edit_item(item)" class="uk-button uk-button-mini uk-button-primary"><i class="uk-icon-edit"></i></a>
+                            <a v-on:click="delete_item(item)" class="uk-button uk-button-mini uk-button-primary"><i class="uk-icon-trash-o"></i></a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table v-if:="'comment' == table" class="uk-table uk-table-hover uk-table-striped uk-overflow-container">
+            <thead>
+                <tr>
+                    <th class="uk-width-2-10">作者</th>
+                    <th class="uk-width-4-10">内容摘要</th>
+                    <th class="uk-width-3-10">创建时间</th>
+                    <th class="uk-width-1-10">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in items" track-by="id">
+                    <td><a target="_blank" v-bind:href="'/user/'+item.user_id" v-text="item.user_name"></a></td>
+                    <td><a target="_blank" v-bind:href="'/blog/'+item.blog_id+'#'+item.id" v-text="item.content.substring(0, 40)"></a></td>
+                    <td><span v-text="item.created_at.toDateTime()"></span></td>
+                    <td>
+                        <a v-on:click="delete_item(item)" class="uk-button uk-button-mini uk-button-primary"><i class="uk-icon-trash-o"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table v-if:="'user' == table" class="uk-table uk-table-hover uk-table-striped uk-overflow-container">
+            <thead>
+                <tr>
+                    <th class="uk-width-3-10">用户名</th>
+                    <th class="uk-width-3-10">邮件</th>
+                    <th class="uk-width-3-10">注册时间</th>
+                    <th class="uk-width-1-10">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in items" track-by="id">
+                    <td>
+                        <a target="_blank" v-bind:href="'/user/'+item.id" v-text="item.name"></a>
+                        <code v-if="item.admin"><i class="uk-icon-key"></i> 管理员</code>
+                    </td>
+                    <td><a target="_blank" v-bind:href="'mailto:'+item.email" v-text="item.email"></a></td>
+                    <td><span v-text="item.created_at.toDateTime()"></span></td>
+                    <td>
+                        <a v-on:click="delete_item(item)" class="uk-button uk-button-mini uk-button-primary"><i class="uk-icon-trash-o"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table v-if:="'category' == table" class="uk-table uk-table-hover uk-table-striped uk-overflow-container">
+            <thead>
+                <tr>
+                    <th class="uk-width-5-10">名称</th>
+                    <th class="uk-width-4-10">创建时间</th>
+                    <th class="uk-width-1-10">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in items" track-by="id">
+                    <td><a target="_blank" v-bind:href="'/category/'+item.id" v-text="item.name"></a></td>
+                    <td><span v-text="item.created_at.toDateTime()"></span></td>
+                    <td>
+                        <div class="uk-button-group">
+                            <a v-on:click="edit_item(item)" class="uk-button uk-button-mini uk-button-primary"><i class="uk-icon-edit"></i></a>
+                            <a v-on:click="delete_item(item)" class="uk-button uk-button-mini uk-button-primary"><i class="uk-icon-trash-o"></i></a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div is="vc-pagination" v-bind:p="page"></div>
+    </div>
+</div>
+{% endblock %}

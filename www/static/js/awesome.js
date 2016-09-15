@@ -353,7 +353,7 @@ if (typeof(Vue)!=='undefined') {
     Vue.filter('datetime', function (value) {
         var d = value;
         if (typeof(value)==='number') {
-            d = new Date(value);
+            d = new Date(value * 1000);
         }
         return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes();
     });
@@ -361,18 +361,18 @@ if (typeof(Vue)!=='undefined') {
         props: ['p'],
         template: '<ul class="uk-pagination">' +
                 '<li v-if="! p.has_pre" class="uk-disabled"><span><i class="uk-icon-angle-double-left"></i></span></li>' +
-                '<li v-else><a :onclick="\'gotoPage(\' + (p.page_index-1) + \')\'" href="#"><i class="uk-icon-angle-double-left"></i></a></li>' +
+                '<li v-else><a @click.prevent="gotoPage(p.page_index-1)" href="#"><i class="uk-icon-angle-double-left"></i></a></li>' +
                 '<li class="uk-active"><span v-if="p.page_index == 1" v-text="1"></span>' +
-                '<a v-else :onclick="\'gotoPage(\' + (1) + \')\'" href="#" v-text="1"></a></li>' +
+                '<a v-else @click.prevent="gotoPage(1)" href="#" v-text="1"></a></li>' +
                 '<li v-if="pl[0] > 2"><span>...</span></li>' +
                 '<li class="uk-active" v-for="pn in pl"><span v-if="pn == p.page_index" v-text="p.page_index"></span>' +
-                '<a v-else :onclick="\'gotoPage(\' + (pn) + \')\'" href="#" v-text="pn"></a>' +
+                '<a v-else @click.prevent="gotoPage(pn)" href="#" v-text="pn"></a>' +
                 '</li>' +
                 '<li v-if="pl[p.page_show-1] < (p.page_count-1)"><span>...</span></li>' +
                 '<li class="uk-active"><span v-if="(p.page_index == p.page_count) && (p.page_count != 1)" v-text="p.page_count"></span>' +
-                '<a v-if="(p.page_index != p.page_count) && (p.page_count != 1) && (p.item_count != 0)" :onclick="\'gotoPage(\' + (p.page_count) + \')\'" href="#" v-text="p.page_count"></a></li>' +
+                '<a v-if="(p.page_index != p.page_count) && (p.page_count != 1) && (p.item_count != 0)" @click.prevent="gotoPage(p.page_count)" href="#" v-text="p.page_count"></a></li>' +
                 '<li v-if="! p.has_next" class="uk-disabled"><span><i class="uk-icon-angle-double-right"></i></span></li>' +
-                '<li v-else><a :onclick.prevent="\'gotoPage(\' + (p.page_index+1) + \')\'" href="#"><i class="uk-icon-angle-double-right"></i></a></li>' +
+                '<li v-else><a @click.prevent="gotoPage(p.page_index+1)" href="#"><i class="uk-icon-angle-double-right"></i></a></li>' +
                 '</ul>',
         computed: {
             pl: function() {
@@ -396,6 +396,11 @@ if (typeof(Vue)!=='undefined') {
                     left++;
                 }
                 return l;
+            }
+        },
+        methods: {
+            gotoPage: function (page) {
+                this.$dispatch('child-page', page);
             }
         }
     });

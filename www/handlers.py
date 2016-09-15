@@ -158,8 +158,8 @@ async def api_show_blogs(*, id):
 
 
 # handler带有默认值的命名关键字参数，用来处理带有查询字符串的url
-@get('/api/blogs')
-async def api_blogs(*, page='1'):
+@get('/api/blog')
+async def api_blog(*, page='1'):
     page_index = Page.page2int(page)
     num = await Blog.findNumber('*')
     p = Page(num, page_index, item_page=configs.manage_item_page, page_show=configs.page_show)
@@ -170,8 +170,8 @@ async def api_blogs(*, page='1'):
 
 
 # handler带有默认值的命名关键字参数，用来处理带有查询字符串的url
-@get('/api/comments')
-async def api_comments(*, page='1'):
+@get('/api/comment')
+async def api_comment(*, page='1'):
     page_index = Page.page2int(page)
     num = await Comment.findNumber('*')
     p = Page(num, page_index, item_page=configs.manage_item_page, page_show=configs.page_show)
@@ -182,8 +182,8 @@ async def api_comments(*, page='1'):
 
 
 # handler带有默认值的命名关键字参数，用来处理带有查询字符串的url
-@get('/api/users')
-async def api_get_users(*, page='1'):
+@get('/api/user')
+async def api_get_user(*, page='1'):
     page_index = Page.page2int(page)
     num = await User.findNumber('*')
     p = Page(num, page_index, item_page=configs.manage_item_page, page_show=configs.page_show)
@@ -196,8 +196,8 @@ async def api_get_users(*, page='1'):
 
 
 # handler带有默认值的命名关键字参数，用来处理带有查询字符串的url
-@get('/api/categories')
-async def api_categories(*, page='1'):
+@get('/api/category')
+async def api_category(*, page='1'):
     page_index = Page.page2int(page)
     num = await Category.findNumber('*')
     p = Page(num, page_index, item_page=configs.manage_item_page, page_show=configs.page_show)
@@ -214,16 +214,11 @@ async def api_show_categories(*, id):
 
 
 @get('/manage')
-def manage():
-    return 'redirect:/manage/blogs'
-
-
-@get('/manage/blogs')
-async def manage_blogs(request, *, page='1'):
+async def manage_ajax(request, *, page='1'):
     user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
     return {
-        '__template__': 'manage_blogs.html',
+        '__template__': 'manage.html',
         'web_meta': configs.web_meta,
         'user': user,
         'cats': cats,
@@ -231,7 +226,7 @@ async def manage_blogs(request, *, page='1'):
     }
 
 
-@get('/manage/blogs/create')
+@get('/manage/blog/create')
 async def manage_blogs_create(request):
     user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
@@ -245,7 +240,7 @@ async def manage_blogs_create(request):
     }
 
 
-@get('/manage/blogs/edit')
+@get('/manage/blog/edit')
 async def manage_blogs_edit(request, *, id):
     user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
@@ -258,52 +253,13 @@ async def manage_blogs_edit(request, *, id):
         'user': user,
         'cats': cats,
         'id': id,
-        'action': '/api/blogs/%s' % id,
+        'action': '/api/blog/%s' % id,
         'uploadlist': uploadlist
     }
 
 
-@get('/manage/comments')
-async def manage_comments(request, *, page='1'):
-    user = request.__user__
-    cats = await Category.findAll(orderBy='created_at desc')
-    return {
-        '__template__': 'manage_comments.html',
-        'web_meta': configs.web_meta,
-        'user': user,
-        'cats': cats,
-        'page_index': Page.page2int(page)
-    }
-
-
-@get('/manage/users')
-async def manage_users(request, *, page='1'):
-    user = request.__user__
-    cats = await Category.findAll(orderBy='created_at desc')
-    return {
-        '__template__': 'manage_users.html',
-        'web_meta': configs.web_meta,
-        'user': user,
-        'cats': cats,
-        'page_index': Page.page2int(page)
-    }
-
-
-@get('/manage/categories')
-async def manage_categories(request, *, page='1'):
-    user = request.__user__
-    cats = await Category.findAll(orderBy='created_at desc')
-    return {
-        '__template__': 'manage_categories.html',
-        'web_meta': configs.web_meta,
-        'user': user,
-        'cats': cats,
-        'page_index': Page.page2int(page)
-    }
-
-
-@get('/manage/categories/create')
-async def manage_categories_create(request):
+@get('/manage/category/create')
+async def manage_category_create(request):
     user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
     return {
@@ -316,8 +272,8 @@ async def manage_categories_create(request):
     }
 
 
-@get('/manage/categories/edit')
-async def manage_categories_edit(request, *, id):
+@get('/manage/category/edit')
+async def manage_category_edit(request, *, id):
     user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
     return {
@@ -326,7 +282,7 @@ async def manage_categories_edit(request, *, id):
         'user': user,
         'cats': cats,
         'id': id,
-        'action': '/api/categories/%s' % id
+        'action': '/api/category/%s' % id
     }
 
 RE_EMAIL = re.compile(r'^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$')
@@ -414,7 +370,7 @@ async def api_create_blog(request, *, title, summary, content, cat_name):
     return blog
 
 
-@post('/api/blogs/{id}')
+@post('/api/blog/{id}')
 async def api_update_blog(id, request, *, title, summary, content, cat_name):
     if request.__user__ is None or not request.__user__.admin:
         raise APIPermissionError('Only admin can do this!')
@@ -443,7 +399,7 @@ async def api_update_blog(id, request, *, title, summary, content, cat_name):
     return blog
 
 
-@post('/api/blogs/{id}/delete')
+@post('/api/blog/{id}/delete')
 async def api_delete_blog(request, *, id):
     if request.__user__ is None or not request.__user__.admin:
         raise APIPermissionError('Only admin can do this!')
@@ -454,7 +410,7 @@ async def api_delete_blog(request, *, id):
     return dict(id=id)
 
 
-@post('/api/blogs/{id}/comments')
+@post('/api/blog/{id}/comment')
 async def api_create_comment(id, request, *, content):
     user = request.__user__
     if user is None or not user.admin:
@@ -469,7 +425,7 @@ async def api_create_comment(id, request, *, content):
     return comment
 
 
-@post('/api/comments/{id}/delete')
+@post('/api/comment/{id}/delete')
 async def api_delete_comment(id, request):
     if request.__user__ is None or not request.__user__.admin:
         raise APIPermissionError('Only admin can do this!')
@@ -480,7 +436,7 @@ async def api_delete_comment(id, request):
     return dict(id=id)
 
 
-@post('/api/users/{id}/delete')
+@post('/api/user/{id}/delete')
 async def api_delete_user(id, request):
     if request.__user__ is None or not request.__user__.admin:
         raise APIPermissionError('Only admin can do this!')
@@ -520,7 +476,7 @@ async def api_create_category(request, *, name):
     return cat
 
 
-@post('/api/categories/{id}')
+@post('/api/category/{id}')
 async def api_update_category(id, request, *, name):
     if request.__user__ is None or not request.__user__.admin:
         raise APIPermissionError('Only admin can do this!')
@@ -532,7 +488,7 @@ async def api_update_category(id, request, *, name):
     return cat
 
 
-@post('/api/categories/{id}/delete')
+@post('/api/category/{id}/delete')
 async def api_delete_category(id, request):
     if request.__user__ is None or not request.__user__.admin:
         raise APIPermissionError('Only admin can do this!')

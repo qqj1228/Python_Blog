@@ -107,3 +107,4 @@ MANIFEST
 static/upload/
 static/images/
 www/config/user.cfg
+jsconfig.json
