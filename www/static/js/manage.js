@@ -4,6 +4,7 @@ function initVM() {
         data: {
             items: {},
             page: {},
+            currentPage: 1,
             table: 'blog'
         },
         ready: function () {
@@ -77,6 +78,7 @@ function initVM() {
             },
             delete_item: function (item) {
                 var name;
+                var self = this;
                 switch (this.table) {
                     case 'blog':
                         name = item.title;
@@ -99,7 +101,7 @@ function initVM() {
                         if (err) {
                             return error(err);
                         }
-                        location.reload();
+                        self.setItems(self.currentPage);
                     });
                 }
             }
@@ -107,6 +109,7 @@ function initVM() {
         events: {
             'child-page': function (page) {
                 this.setItems(page);
+                this.currentPage = page;
             }
         }
     });
