@@ -5,13 +5,12 @@
 
 ## 依赖的第三方库
 
-- jinja2
 - aiomysql
 - aiohttp
+- jinja2
 - markdown2
 - watchdog（开发环境使用）
 - pygments
-- [pygments css](https://github.com/richleland/pygments-css)
 
 ## 增加修改的主要功能
 
@@ -23,5 +22,6 @@
 6. 使用JSON格式配置文件，并支持注释
 7. 完善程序退出机制，手工退出不会报错
 8. 代码高亮，gfm风格的markdown代码块
+9. 后台管理页面采用单页应用风格
 
-上线效果[www.cashqian.net](http://www.cashqian.net)
+更详细说明请浏览：[www.cashqian.net/about](http://www.cashqian.net/about)
