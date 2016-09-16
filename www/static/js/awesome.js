@@ -379,6 +379,18 @@ if (typeof(Vue)!=='undefined') {
                 var left = 2;
                 var right = this.p.page_count;
                 var l = [];
+                if (this.p === {}) {
+                    this.p.item_count = 1;
+                    this.p.page_index = 1;
+                    this.p.item_page = 10;
+                    this.p.page_show = 1;
+                    this.p.page_count = Math.floor(this.p.item_count / (this.p.item_page + (this.p.item_count % this.p.item_page > 0 ? 1 : 0)));
+                    this.p.offset = 0;
+                    this.p.limit = 0;
+                    this.p.page_index = 1;
+                    this.p.has_next = false;
+                    this.p.has_pre = false;
+                }
                 if (this.p.page_count > this.p.page_show) {
                     left = this.p.page_index - parseInt(this.p.page_show/2);
                     if (left < 2) {
