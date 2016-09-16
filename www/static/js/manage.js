@@ -13,6 +13,7 @@ function initVM() {
         methods: {
             setItems: function (p) {
                 var self = this;
+                this.items = {};
                 $('#loading').show();
                 getJSON('/api/manage/' + this.table, { page: p }, function (err, res) {
                     if (err) {
