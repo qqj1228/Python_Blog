@@ -29,7 +29,7 @@ async def index(request, *, page='1'):
     if num == 0:
         blogs = []
     else:
-        blogs = await Blog.findAll('title<>?', ['__about__'], orderBy='created_at desc', limit=(p.offset, p.limit))
+        blogs = await Blog.findAll(where='title<>?', args=['__about__'], orderBy='created_at desc', limit=(p.offset, p.limit))
         for blog in blogs:
             blog.html_summary = markdown(blog.summary, extras=['code-friendly', 'fenced-code-blocks'])
     return {
@@ -47,7 +47,7 @@ async def index(request, *, page='1'):
 async def about(request):
     user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
-    blog = await Blog.findAll('title=?', ['__about__'])
+    blog = await Blog.findAll(where='title=?', args=['__about__'])
     logging.info('blog: %s' % blog)
     blog[0].html_content = markdown(blog[0].content, extras=['code-friendly', 'fenced-code-blocks'])
     return {
@@ -95,7 +95,7 @@ async def get_blog(id, request):
     blog = await Blog.find(id)
     blog.view_count = blog.view_count + 1
     await blog.update()
-    comments = await Comment.findAll('blog_id=?', [id], orderBy='created_at desc')
+    comments = await Comment.findAll(where='blog_id=?', args=[id], orderBy='created_at desc')
     for c in comments:
         c.html_content = markdown(c.content, extras=['code-friendly', 'fenced-code-blocks'])
     blog.html_content = markdown(blog.content, extras=['code-friendly', 'fenced-code-blocks'])
@@ -136,7 +136,7 @@ async def get_category(id, request, *, page='1'):
     if num == 0:
         blogs = []
     else:
-        blogs = await Blog.findAll('cat_id=?', [id], orderBy='created_at desc', limit=(p.offset, p.limit))
+        blogs = await Blog.findAll(where='cat_id=?', args=[id], orderBy='created_at desc', limit=(p.offset, p.limit))
         for blog in blogs:
             blog.html_summary = markdown(blog.summary, extras=['code-friendly', 'fenced-code-blocks'])
     return {
@@ -165,7 +165,8 @@ async def api_manage_blog(*, page='1'):
     p = Page(num, page_index, item_page=configs.manage_item_page, page_show=configs.page_show)
     if num == 0:
         return dict(page=p, blogs=())
-    blogs = await Blog.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
+    col = ['id', 'user_id', 'user_name', 'title', 'created_at']
+    blogs = await Blog.findAll(col=col, orderBy='created_at desc', limit=(p.offset, p.limit))
     return dict(page=p, blogs=blogs)
 
 
@@ -298,7 +299,7 @@ async def api_signin(*, email, name, password):
     if not password or not RE_SHA1.match(password):
         raise APIValueError('password')
 
-    users = await User.findAll('email=?', [email])
+    users = await User.findAll(where='email=?', args=[email])
     if len(users) > 0:
         raise APIError('signin:failed', 'email', 'Email is already in use.')
     uid = next_id()
@@ -320,7 +321,7 @@ async def api_login(*, email, password, rememberme):
         raise APIValueError('email', 'Invalid email.')
     if not password:
         raise APIValueError('password', 'Invalid password.')
-    users = await User.findAll('email=?', [email])
+    users = await User.findAll(where='email=?', args=[email])
     if len(users) == 0:
         raise APIValueError('email', 'Email not exist.')
     user = users[0]
@@ -361,7 +362,7 @@ async def api_create_blog(request, *, title, summary, content, cat_name):
     if not cat_name.strip():
         cat_id = None
     else:
-        cats = await Category.findAll('name=?', [cat_name.strip()])
+        cats = await Category.findAll(where='name=?', args=[cat_name.strip()])
         if (len(cats) == 0):
             raise APIValueError('cat_name', 'cat_name is not belong to Category.')
         cat_id = cats[0].id
@@ -391,7 +392,7 @@ async def api_update_blog(id, request, *, title, summary, content, cat_name):
         blog.cat_id = None
     else:
         blog.cat_name = cat_name.strip()
-        cats = await Category.findAll('name=?', [cat_name.strip()])
+        cats = await Category.findAll(where='name=?', args=[cat_name.strip()])
         if (len(cats) == 0):
             raise APIValueError('cat_name', 'cat_name is not belong to Category.')
         blog.cat_id = cats[0].id
@@ -501,6 +502,5 @@ async def api_delete_category(id, request):
 
 @post('/api/preview')
 async def api_preview(*, content):
-    logging.info('*************content:%s' % content)
     preview = markdown(content, extras=['code-friendly', 'fenced-code-blocks'])
     return dict(preview=preview)

@@ -188,9 +188,13 @@ class Model(dict, metaclass=ModelMetaclass):
         return value
 
     @classmethod
-    async def findAll(cls, where=None, args=None, **kw):
+    async def findAll(cls, col=None, where=None, args=None, **kw):
         'find objects by where clause, return value is a list'
-        sql = [cls.__select__]
+        if col is None:
+            sql = [cls.__select__]
+        else:
+            _select = 'select `%s` from `%s`' % ('`, `'.join(col), cls.__table__)
+            sql = [_select]
         if where:
             sql.append('where')
             sql.append(where)
@@ -211,7 +215,8 @@ class Model(dict, metaclass=ModelMetaclass):
                 args.extend(limit)
             else:
                 raise ValueError('Invalid limit value: %s' % str(limit))
-        print('args: %s' % args)
+        logging.info('sql: %s' % sql)
+        logging.info('args: %s' % args)
         rs = await select(' '.join(sql), args)
         return [cls(**r) for r in rs]
 
