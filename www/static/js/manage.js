@@ -1,11 +1,11 @@
-function initVM() {
+function initVM(def) {
     var vm = new Vue({
         el: '#vm',
         data: {
-            items: {},
-            page: {},
-            currentPage: 1,
-            table: 'blog'
+            items: def.items,
+            page: def.page,
+            currentPage: def.currentPage,
+            table: def.table
         },
         ready: function () {
             this.setItems(1);
@@ -114,9 +114,29 @@ function initVM() {
             }
         }
     });
-};
+}
+
+function initPage() {
+    p = {};
+    p.item_count = 1;
+    p.page_index = 1;
+    p.item_page = 10;
+    p.page_show = 1;
+    p.page_count = Math.floor(p.item_count / (p.item_page + (p.item_count % p.item_page > 0 ? 1 : 0)));
+    p.offset = 0;
+    p.limit = 0;
+    p.page_index = 1;
+    p.has_next = false;
+    p.has_pre = false;
+    return p;
+}
 
 $(function() {
-    initVM();
+    var def = {};
+    def.itmes = {};
+    def.page = initPage();
+    def.currentPage = 1;
+    def.table = 'blog';
+    initVM(def);
 });
 

@@ -218,12 +218,14 @@ async def api_category(*, id):
 async def manage_ajax(request, *, page='1'):
     user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
+    # 设置Page类缺省值
+    p = Page(1, 1, item_page=configs.manage_item_page, page_show=configs.page_show)
     return {
         '__template__': 'manage.html',
         'web_meta': configs.web_meta,
         'user': user,
         'cats': cats,
-        'page_index': Page.page2int(page)
+        'page': p
     }
 
 
