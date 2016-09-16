@@ -122,10 +122,9 @@ function initPage() {
     p.page_index = 1;
     p.item_page = 10;
     p.page_show = 1;
-    p.page_count = Math.floor(p.item_count / (p.item_page + (p.item_count % p.item_page > 0 ? 1 : 0)));
+    p.page_count = Math.floor(p.item_count / p.item_page + (p.item_count % p.item_page > 0 ? 1 : 0));
     p.offset = 0;
     p.limit = 0;
-    p.page_index = 1;
     p.has_next = false;
     p.has_pre = false;
     return p;
