@@ -24,7 +24,7 @@
 {% endblock %}
 {% block content %}
     <!-- blog -->
-    <article class="uk-article">
+    <article class="uk-article uk-overflow-container">
         <h1 class="uk-article-title">{{ blog.title }}</h1>
         <p class="uk-article-meta">
             由 <a href="/user/{{ blog.user_id }}">{{ blog.user_name }}</a> 发表于 {{ blog.created_at|deltatime}}

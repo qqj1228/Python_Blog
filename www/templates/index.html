@@ -9,7 +9,7 @@
 {% block content %}
     <!-- post -->
     {% for blog in blogs %}
-        <article class="uk-article">
+        <article class="uk-article uk-overflow-container">
             <h1 class="uk-article-title">
                 <a href="/blog/{{ blog.id }}">{{ blog.title }}</a>
             </h1>
