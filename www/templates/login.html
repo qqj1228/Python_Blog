@@ -1,64 +1,87 @@
 {% extends 'base.html' %}
 {% block title %}用户登陆{% endblock %}
 {% block script %}
-    <script type="text/javascript">
-        function validateEmail(email) {
-            var re = /^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$/;
-            return re.test(email.toLowerCase());
-        }
-        $(function () {
-            var vm = new Vue({
-                el: '#vm',
-                data: {
-                    email: '',
-                    password: '',
-                    rememberme: false
-                },
-                methods: {
-                    submit: function (event) {
-                        event.preventDefault();
-                        var $form = $("#vm");
-                        if (! validateEmail(this.email.trim().toLowerCase())) {
-                            return $form.showFormError('请输入正确的Email地址');
-                        }
-                        var email = this.email.trim().toLowerCase();
-                        $form.postJSON('/api/login', {
-                            email: email,
-                            password: this.password==='' ? '' : CryptoJS.SHA1(email + ':' + this.password).toString(),
-                            rememberme: this.rememberme
-                        }, function (err, r) {
-                            if (err) {
-                                return $form.showFormError(err);
-                            }
-                            return location.assign('/')
-                        });
+<script type="text/javascript">
+    function validateEmail(email) {
+        var re = /^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$/;
+        return re.test(email.toLowerCase());
+    }
+    $(function () {
+        $('#loading').hide();
+        var vm = new Vue({
+            el: '#vm',
+            data: {
+                email: '',
+                password: '',
+                rememberme: false
+            },
+            methods: {
+                submit: function (event) {
+                    event.preventDefault();
+                    var $form = $("#vm");
+                    if (! validateEmail(this.email.trim().toLowerCase())) {
+                        return $form.showFormError('请输入正确的Email地址');
                     }
+                    var email = this.email.trim().toLowerCase();
+                    $form.postJSON('/api/login', {
+                        email: email,
+                        password: this.password==='' ? '' : CryptoJS.SHA1(email + ':' + this.password).toString(),
+                        rememberme: this.rememberme
+                    }, function (err, r) {
+                        if (err) {
+                            return $form.showFormError(err);
+                        }
+                        return location.assign('/');
+                    });
+                },
+                forget: function () {
+                    $('#loading').show();
+                    var $form = $("#vm");
+                    if (! validateEmail(this.email.trim().toLowerCase())) {
+                        return $form.showFormError('请输入忘记密码的账号的Email地址');
+                    }
+                    var email = this.email.trim().toLowerCase();
+                    getJSON('/api/reset_password', { email: email }, function (err, r) {
+                        $('#loading').hide();
+                        if (err) {
+                            error(err);
+                            return;
+                        }
+                        alert('重置后的密码已发送，请登陆您的email查看');
+                        return;
+                    });
                 }
-            });
-            $('#vm').show();
+            }
         });
-    </script>
+        $('#vm').show();
+    });
+</script>
 {% endblock %}
 {% block content %}
-    <form id="vm" v-on:submit="submit" class="uk-panel uk-panel-box uk-panel-header uk-form uk-form-stacked">
-        <h3 class="uk-panel-title">请填写登录信息</h3>
-        <div class="uk-alert uk-alert-danger uk-hidden"></div>
-        <div class="uk-form-row">
-            <label class="uk-form-label">Email:</label>
-            <div class="uk-form-controls">
-                <input v-model="email" name="email" class="uk-width-1-1" maxlength="50" type="email" placeholder="user_name@example.com">
-            </div>
+<div id="error" class="uk-width-1-1"></div>
+<div id="loading" class="uk-width-1-1 uk-text-center uk-margin-bottom uk-position-z-index">
+    <span><i class="uk-icon-spinner uk-icon-medium uk-icon-spin"></i> 正在处理...</span>
+</div>
+
+<form id="vm" v-on:submit="submit" class="uk-panel uk-panel-box uk-panel-header uk-form uk-form-stacked">
+    <h3 class="uk-panel-title">请填写登录信息</h3>
+    <div class="uk-alert uk-alert-danger uk-hidden"></div>
+    <div class="uk-form-row">
+        <label class="uk-form-label">Email:</label>
+        <div class="uk-form-controls">
+            <input v-model="email" name="email" class="uk-width-1-1" maxlength="50" type="email" placeholder="user_name@example.com">
         </div>
-        <div class="uk-form-row">
-            <label class="uk-form-label">密码:</label>
-            <div class="uk-form-controls">
-                <input v-model="password" name="password" class="uk-width-1-1" maxlength="50" type="password" placeholder="密码">
-            </div>
+    </div>
+    <div class="uk-form-row">
+        <label class="uk-form-label">密码:</label>
+        <div class="uk-form-controls">
+            <input v-model="password" name="password" class="uk-width-1-1" maxlength="50" type="password" placeholder="密码">
         </div>
-        <div class="uk-form-row">
-            <button class="uk-button uk-button-primary" type="submit"><i class="uk-icon-sign-in"></i> 登陆</button>
-            <label class="uk-margin-left"><input v-model="rememberme" type="checkbox" name="rememberme"> 记住我</label>
-            <a class="uk-margin-left uk-link uk-link-muted" href="#">找回密码</a>
-        </div>
-    </form>
+    </div>
+    <div class="uk-form-row">
+        <button class="uk-button uk-button-primary" type="submit"><i class="uk-icon-sign-in"></i> 登陆</button>
+        <label class="uk-margin-left"><input v-model="rememberme" type="checkbox" name="rememberme"> 记住我</label>
+        <a v-on:click.prevent="forget" class="uk-margin-left uk-link uk-link-muted" href="#">忘记密码</a>
+    </div>
+</form>
 {% endblock %}

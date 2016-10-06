@@ -6,6 +6,11 @@ import hashlib
 import json
 import logging
 import os
+import smtplib
+import time
+from email.header import Header
+from email.mime.text import MIMEText
+from email.utils import parseaddr, formataddr
 
 from aiohttp import web
 from markdown2 import markdown
@@ -289,6 +294,47 @@ async def manage_category_edit(request, *, id):
         'action': '/api/category/%s' % id
     }
 
+
+def _format_addr(s):
+    name, addr = parseaddr(s)
+    return formataddr((Header(name, 'utf-8').encode(), addr))
+
+
+@get('/api/reset_password')
+async def api_reset_password(*, email):
+    # 重置密码
+    if not email:
+        raise APIValueError('email', 'Invalid email.')
+    users = await User.findAll(where='email=?', args=[email])
+    if len(users) == 0:
+        raise APIValueError('email', 'Email not exist.')
+    user = users[0]
+    s = '%s:%d' % (user.id, int(time.time() * 1000))
+    password0 = hashlib.md5(s.encode('utf-8')).hexdigest()[:10]        # 重置后的密码
+    password1 = '%s:%s' % (email, password0)
+    password1 = hashlib.sha1(password1.encode('utf-8')).hexdigest()    # 模拟客户端用email加密密码
+    sha1_password = '%s:%s' % (user.id, password1)
+    user.password = hashlib.sha1(sha1_password.encode('utf-8')).hexdigest()
+    await user.update()
+
+    # 发送email
+    from_addr = configs.email.addr
+    password = configs.email.password
+    to_addr = email
+    smtp_server = configs.email.server
+    smtp_port = configs.email.port
+    msg = MIMEText('您的密码已经重置，请使用新密码登陆网站并尽快修改密码。\n重置后的新密码为: ' + password0, 'plain', 'utf-8')
+    msg['From'] = _format_addr('管理员 <%s>' % from_addr)
+    msg['To'] = _format_addr('%s <%s>' % (user.name, to_addr))
+    msg['Subject'] = Header('来自 ' + configs.web_meta.web_name + ' - 重置密码', 'utf-8').encode()
+    server = smtplib.SMTP(smtp_server, smtp_port)
+    server.starttls()
+    server.set_debuglevel(1)
+    server.login(from_addr, password)
+    server.sendmail(from_addr, [to_addr], msg.as_string())
+    server.quit()
+    return dict(email=email)
+
 RE_EMAIL = re.compile(r'^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$')
 RE_SHA1 = re.compile(r'^[0-9a-f]{40}$')
 
@@ -532,6 +578,7 @@ async def api_modify_password(request, *, user_id, password0, password1, passwor
     sha1.update(password0.encode('utf-8'))
     if user.password != sha1.hexdigest():
         raise APIValueError('password', 'Invalid old password.')
+    # 修改密码
     sha1_password = '%s:%s' % (user_id, password1)
     user.password = hashlib.sha1(sha1_password.encode('utf-8')).hexdigest()
     await user.update()
