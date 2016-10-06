@@ -115,6 +115,7 @@ async def get_user(id, request):
     user = request.__user__
     cats = await Category.findAll(orderBy='created_at desc')
     user_show = await User.find(id)
+    user_show.password = '******'
     return {
         '__template__': 'user.html',
         'web_meta': configs.web_meta,
@@ -303,7 +304,7 @@ async def api_signin(*, email, name, password):
 
     users = await User.findAll(where='email=?', args=[email])
     if len(users) > 0:
-        raise APIError('signin:failed', 'email', 'Email is already in use.')
+        raise APIError('signup:failed', 'email', 'Email is already in use.')
     uid = next_id()
     sha1_password = '%s:%s' % (uid, password)
     user = User(id=uid, name=name.strip(), email=email, password=hashlib.sha1(sha1_password.encode('utf-8')).hexdigest(), image=configs.web_meta.user_image)
@@ -506,3 +507,32 @@ async def api_delete_category(id, request):
 async def api_preview(*, content):
     preview = markdown(content, extras=['code-friendly', 'fenced-code-blocks'])
     return dict(preview=preview)
+
+
+@post('/api/modify_password')
+async def api_modify_password(request, *, user_id, password0, password1, password2):
+    if request.__user__ is None:
+        raise APIPermissionError('You must login first!')
+    if not user_id or not user_id.strip():
+        raise APIValueError('user_id', 'user_id can not be empty.')
+    if not password0 or not password0.strip():
+        raise APIValueError('password0', 'old password can not be empty.')
+    if not password1 or not RE_SHA1.match(password1):
+        raise APIValueError('password1', 'Invalid new password.')
+    if not password2 or not RE_SHA1.match(password2):
+        raise APIValueError('password2', 'Invalid confirmimg password.')
+
+    user = await User.find(user_id)
+    if user is None:
+        raise APIResourceNotFoundError('User not found')
+    # 检查密码
+    sha1 = hashlib.sha1()
+    sha1.update(user_id.encode('utf-8'))
+    sha1.update(b':')
+    sha1.update(password0.encode('utf-8'))
+    if user.password != sha1.hexdigest():
+        raise APIValueError('password', 'Invalid old password.')
+    sha1_password = '%s:%s' % (user_id, password1)
+    user.password = hashlib.sha1(sha1_password.encode('utf-8')).hexdigest()
+    await user.update()
+    return dict(user_id=user_id)

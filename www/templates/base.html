@@ -78,7 +78,8 @@
                             <a href="#0"><i class="uk-icon-user"></i> {{ user.name }} <i class="uk-icon-caret-down"></i></a>
                             <div class="uk-dropdown uk-dropdown-navbar uk-dropdown-small">
                                 <ul class="uk-nav uk-nav-navbar">
-                                <li><a href="/manage"><i class="uk-icon-gear"></i> 后台管理</a></li>
+                                    <li><a href="/user/{{ user.id }}"><i class="uk-icon-info-circle"></i> 用户信息</a></li>
+                                    <li><a href="/manage"><i class="uk-icon-gear"></i> 后台管理</a></li>
                                     <li><a href="/logout"><i class="uk-icon-sign-out"></i> 登出</a></li>
                                 </ul>
                             </div>

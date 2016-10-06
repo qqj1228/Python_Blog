@@ -1,29 +1,99 @@
 {% extends 'base.html' %}
 {% block title %}{{ user_show.name }}{% endblock %}
+{% block script %}
+<link rel="stylesheet" href="/static/css/accordion.almost-flat.min.css">
+<script src="/static/js/accordion.min.js"></script>
+<script type="text/javascript">
+$(function () {
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+            password0: '',
+            password1: '',
+            password2: ''
+        },
+        methods: {
+            submit: function (event) {
+                event.preventDefault();
+                var $form = $("#vm");
+                if (this.password1.length < 6) {
+                    return $form.showFormError('新密码长度至少为6个字符');
+                }
+                if (this.password1 !== this.password2) {
+                    return $form.showFormError('两次输入的密码不一致');
+                }
+                $form.postJSON('/api/modify_password', {
+                    user_id: '{{ user_show.id }}',
+                    password0: this.password0==='' ? '' : CryptoJS.SHA1('{{ user_show.email }}' + ':' + this.password0).toString(),
+                    password1: this.password1==='' ? '' : CryptoJS.SHA1('{{ user_show.email }}' + ':' + this.password1).toString(),
+                    password2: this.password2==='' ? '' : CryptoJS.SHA1('{{ user_show.email }}' + ':' + this.password2).toString()
+                }, function (err, r) {
+                    if (err) {
+                        return $form.showFormError(err);
+                    }
+                    alert("密码修改成功，请使用新密码重新登陆");
+                    return location.assign('/logout');
+                });
+            }
+        }
+    });
+    $('#vm').show();
+});
+</script>
+{% endblock %}
 {% block content %}
-    <div class="uk-width-1-1 uk-panel uk-panel-box uk-panel-header">
-        <h3 class="uk-panel-title">用户信息</h3>
-        <ul class="uk-list">
-            <li class="uk-grid">
-                <div class="uk-width-1-3">用户名:</div>
-                <div class="uk-width-2-3">{{ user_show.name }}
-                {% if user_show.admin %}
-                    <code><i class="uk-icon-key"></i> 管理员</code>
-                {% endif %}
+<div class="uk-width-1-1 uk-panel uk-panel-box uk-panel-header">
+    <h3 class="uk-panel-title">用户信息</h3>
+    <ul class="uk-list">
+        <li class="uk-grid">
+            <div class="uk-width-1-3">用户名:</div>
+            <div class="uk-width-2-3">{{ user_show.name }}
+            {% if user_show.admin %}
+                <code><i class="uk-icon-key"></i> 管理员</code>
+            {% endif %}
+            </div>
+        </li>
+        <li class="uk-grid">
+            <div class="uk-width-1-3">头像:</div>
+            <div class="uk-width-2-3"><img width="50" height="50" src="{{  user_show.image }}"></div>
+        </li>
+        <li class="uk-grid">
+            <div class="uk-width-1-3">Email:</div>
+            <div class="uk-width-2-3">{{ user_show.email }}</div>
+        </li>
+        <li class="uk-grid">
+            <div class="uk-width-1-3">注册时间:</div>
+            <div class="uk-width-2-3">{{ user_show.created_at|deltatime }}</div>
+        </li>
+    </ul>
+</div>
+<div class="uk-accordion uk-margin-top" data-uk-accordion="{showfirst: false}">
+    <h3 class="uk-accordion-title"><i class="uk-icon-plus"></i> 修改密码</h3>
+    <div class="uk-accordion-content">
+        <form id="vm" v-on:submit="submit" class="uk-panel uk-panel-box uk-form uk-form-stacked">
+            <div class="uk-alert uk-alert-danger uk-hidden"></div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">旧密码:</label>
+                <div class="uk-form-controls">
+                    <input v-model="password0" name="password0" class="uk-width-1-1" maxlength="50" type="password" placeholder="旧密码">
                 </div>
-            </li>
-            <li class="uk-grid">
-                <div class="uk-width-1-3">头像:</div>
-                <div class="uk-width-2-3"><img width="50" height="50" src="{{  user_show.image }}"></div>
-            </li>
-            <li class="uk-grid">
-                <div class="uk-width-1-3">Email:</div>
-                <div class="uk-width-2-3">{{ user_show.email }}</div>
-            </li>
-            <li class="uk-grid">
-                <div class="uk-width-1-3">注册时间:</div>
-                <div class="uk-width-2-3">{{ user_show.created_at|deltatime }}</div>
-            </li>
-        </ul>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">新密码:</label>
+                <div class="uk-form-controls">
+                    <input v-model="password1" name="password1" class="uk-width-1-1" maxlength="50" type="password" placeholder="新密码">
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">确认密码:</label>
+                <div class="uk-form-controls">
+                    <input v-model="password2" name="password2" class="uk-width-1-1" maxlength="50" type="password" placeholder="确认密码">
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <button class="uk-button uk-button-primary" type="submit"><i class="uk-icon-edit"></i> 提交</button>
+            </div>
+        </form>
     </div>
+</div>
 {% endblock %}
