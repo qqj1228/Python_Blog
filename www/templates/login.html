@@ -35,12 +35,12 @@
                     });
                 },
                 forget: function () {
-                    $('#loading').show();
                     var $form = $("#vm");
                     if (! validateEmail(this.email.trim().toLowerCase())) {
-                        return $form.showFormError('请输入忘记密码的账号的Email地址');
+                        return $form.showFormError('请在Email栏内输入忘记密码的账号Email地址');
                     }
                     var email = this.email.trim().toLowerCase();
+                    $('#loading').show();
                     getJSON('/api/reset_password', { email: email }, function (err, r) {
                         $('#loading').hide();
                         if (err) {
