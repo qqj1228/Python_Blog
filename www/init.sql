@@ -27,7 +27,7 @@ create table blog (
     `user_image` varchar(500) not null,
     `cat_id` varchar(50),
     `cat_name` varchar(50),
-    'view_count' int unsigned not null,
+    `view_count` int unsigned not null,
     `title` varchar(50) not null,
     `summary` varchar(200) not null,
     `content` text not null,
