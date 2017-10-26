@@ -53,3 +53,6 @@ create table category (
     unique key `idx_name` (`name`),
     key `idx_created_at` (`created_at`)
 ) engine=innodb default charset=utf8;
+
+insert into user (id,email,admin,name,image,created_at,password) values ("001509031623528dfbb1f415a584f238c22fb23359afb18000","admin@example.com",1,"admin","/static/images/user.svg",unix_timestamp(),"e123fe7fa6d63d04254687a1a026f14770fa162d");
+
