@@ -251,6 +251,7 @@ async def response_factory(app, handler):
         return resp
     return response_middleware
 
+
 async def auth_factory(app, handler):
     async def auth_middleware(request):
         if not request.path.startswith('/static'):
@@ -386,8 +387,8 @@ class Page(object):
 
 def filelist(dir):
     filelist = []
-    l = os.listdir(dir)
-    for file in l:
+    flist = os.listdir(dir)
+    for file in flist:
         if os.path.isfile(os.path.join(dir, file)) and not file.startswith('.'):
             filelist.append(file)
     return filelist

@@ -44,6 +44,7 @@ def toDotDict(d):
         D[k] = toDotDict(v) if isinstance(v, dict) else v
     return D
 
+
 path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config')
 
 

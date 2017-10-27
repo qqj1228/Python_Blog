@@ -58,13 +58,15 @@ def deltatime_filter(t):
 
 def date_filter(t):
     '''
-    jinjia2自定义过滤器，以“年－月－日”格式显示日期
+    jinja2自定义过滤器，以“年－月－日”格式显示日期
     '''
     dt = datetime.fromtimestamp(t)
     return u'%s-%s-%s' % (dt.year, dt.month, dt.day)
 
+
 async def on_close(app):
     await myorm.close_pool()
+
 
 async def init(loop):
     rs = dict()
