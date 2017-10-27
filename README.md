@@ -24,11 +24,11 @@
 8. 代码高亮，gfm风格的markdown代码块
 9. 后台管理页面采用单页应用风格
 
-##安装后默认账号
+## 安装后默认账号
 安装后请尽快修改默认账号密码
 账号:admin@example.com
 密码:admin
 
-##关于页面
+## 关于页面
 创建标题为"__about__"的博客即可
 更详细说明请浏览：[www.cashqian.net/about](http://www.cashqian.net/about)
