@@ -30,5 +30,5 @@
 密码:admin
 
 ## 关于页面
-创建标题为"__about__"的博客即可
+创建标题为"\_\_about\_\_"的博客即可
 更详细说明请浏览：[www.cashqian.net/about](http://www.cashqian.net/about)
